@@ -74,13 +74,24 @@ public class ChessPiece {
                     while (tempRowInt >= 1 & tempRowInt <= 8 & tempColInt >= 1 & tempRowInt <= 8){
                         // Check if there's a piece in the way
                         ChessPosition candidatePosition = new ChessPosition(tempRowInt, tempColInt);
+                        boolean pieceAtPosition = false; // This will be the default
                         if (board.getPiece(candidatePosition) != null){
+                            pieceAtPosition = true;
+                            // Check if it's an enemy piece
+                            ChessPiece myPiece = board.getPiece(myPosition);
+                            ChessPiece otherPiece = board.getPiece(candidatePosition);
+                            if (myPiece.getTeamColor() == otherPiece.getTeamColor()){
+                                break; // Don't capture your own piece. That would be silly.
+                            }
+                        }
+                        // Add move to list
+                        ChessMove validMove = new ChessMove(myPosition, candidatePosition, null);
+                        moveCollection.add(validMove);
+                        // If you captured an enemy piece, stop here
+                        if (pieceAtPosition){
                             break;
                         }
-                        // If the path is clear, add to list
                         else{
-                            ChessMove validMove = new ChessMove(myPosition, candidatePosition, null);
-                            moveCollection.add(validMove);
                             // Update integers for next position check
                             tempRowInt = tempRowInt + hMove;
                             tempColInt = tempColInt + vMove;
@@ -91,6 +102,10 @@ public class ChessPiece {
         }
         return moveCollection;
     }
+
+    // Helper and Override Methods
+
+
 
     @Override
     public String toString() {
