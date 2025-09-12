@@ -3,6 +3,7 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -70,7 +71,7 @@ public class ChessPiece {
                     int tempRowInt = startRow + hMove;
                     int tempColInt = startCol + vMove;
                     // Check if move is out of bounds (Row and Col positions must be b/t 1 and 8)
-                    while (tempRowInt > 1 & tempRowInt < 8 & tempColInt > 1 & tempRowInt < 8){
+                    while (tempRowInt >= 1 & tempRowInt <= 8 & tempColInt >= 1 & tempRowInt <= 8){
                         // Check if there's a piece in the way
                         ChessPosition candidatePosition = new ChessPosition(tempRowInt, tempColInt);
                         if (board.getPiece(candidatePosition) != null){
@@ -90,4 +91,26 @@ public class ChessPiece {
         }
         return moveCollection;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s, %s", pieceColor, type);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessPiece that = (ChessPiece) o;
+        return pieceColor == that.pieceColor && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, type);
+    }
 }
+
+
