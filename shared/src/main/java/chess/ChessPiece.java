@@ -56,19 +56,27 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
-        Collection<ChessMove> moveCollection = null;
+        Collection<ChessMove> moveCollection;
+        List<Integer> horizontalMoves = null;
+        List<Integer> verticalMoves = null;
+        boolean goToEndOfBoard = true;
         if (piece.getPieceType() == PieceType.BISHOP) {
             // Bishop can move any diagonal direction as long as the path isn't blocked
-            List<Integer> horizontalMoves = List.of(-1, 1);
-            List<Integer> verticalMoves = List.of(-1, 1);
-            moveCollection = findMoves(myPosition, board, horizontalMoves, verticalMoves);
+            horizontalMoves = List.of(-1, 1);
+            verticalMoves = List.of(-1, 1);
+        } else if (piece.getPieceType() == PieceType.KING) {
+            // King can move in any diagonal, vertical, or horizontal position that's 1 away
+            goToEndOfBoard = false;
+            horizontalMoves = List.of(-1, 0, 1);
+            verticalMoves = List.of(-1, 0, 1);
         }
+        moveCollection = findMoves(myPosition, board, horizontalMoves, verticalMoves, goToEndOfBoard);
         return moveCollection;
     }
 
     // Helper and Override Methods
 
-    private Collection<ChessMove> findMoves(ChessPosition myPosition, ChessBoard board, List<Integer> horizontalMoves, List<Integer> verticalMoves){
+    private Collection<ChessMove> findMoves(ChessPosition myPosition, ChessBoard board, List<Integer> horizontalMoves, List<Integer> verticalMoves, boolean goToEndOfBoard){
         List<ChessMove> moveCollection = new ArrayList<>();
         int startRow = myPosition.getRow();
         int startCol = myPosition.getColumn();
@@ -78,7 +86,7 @@ public class ChessPiece {
                 int tempRowInt = startRow + hMove;
                 int tempColInt = startCol + vMove;
                 // Check if move is out of bounds (Row and Col positions must be b/t 1 and 8)
-                while (tempRowInt >= 1 & tempRowInt <= 8 & tempColInt >= 1 & tempRowInt <= 8){
+                while (tempRowInt >= 1 & tempRowInt <= 8 & tempColInt >= 1 & tempColInt <= 8){
                     // Check if there's a piece in the way
                     ChessPosition candidatePosition = new ChessPosition(tempRowInt, tempColInt);
                     boolean pieceAtPosition = false; // This will be the default
@@ -94,14 +102,20 @@ public class ChessPiece {
                     // Add move to list
                     ChessMove validMove = new ChessMove(myPosition, candidatePosition, null);
                     moveCollection.add(validMove);
-                    // If you captured an enemy piece, stop here
-                    if (pieceAtPosition){
+                    // If the piece has limited mobility (e.g., a king), stop here
+                    if (!goToEndOfBoard){
                         break;
                     }
                     else{
-                        // Update integers for next position check
-                        tempRowInt = tempRowInt + hMove;
-                        tempColInt = tempColInt + vMove;
+                        // If you captured an enemy piece, stop here
+                        if (pieceAtPosition){
+                            break;
+                        }
+                        else{
+                            // Update integers for next position check
+                            tempRowInt = tempRowInt + hMove;
+                            tempColInt = tempColInt + vMove;
+                        }
                     }
                 }
             }
