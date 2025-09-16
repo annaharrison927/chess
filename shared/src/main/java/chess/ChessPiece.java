@@ -56,56 +56,58 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
-        List<ChessMove> moveCollection = new ArrayList<>();
-        // VALID MOVES FOR BISHOP
-        if (piece.getPieceType() == PieceType.BISHOP){
+        Collection<ChessMove> moveCollection = null;
+        if (piece.getPieceType() == PieceType.BISHOP) {
             // Bishop can move any diagonal direction as long as the path isn't blocked
             List<Integer> horizontalMoves = List.of(-1, 1);
             List<Integer> verticalMoves = List.of(-1, 1);
-            int startRow = myPosition.getRow();
-            int startCol = myPosition.getColumn();
-            // Starting from the current position, iterate through all diagonal directions and add to list
-            // GO BACK LATER AND UPDATE FOR EFFICIENCY
-            for (var hMove : horizontalMoves){
-                for (var vMove : verticalMoves){
-                    int tempRowInt = startRow + hMove;
-                    int tempColInt = startCol + vMove;
-                    // Check if move is out of bounds (Row and Col positions must be b/t 1 and 8)
-                    while (tempRowInt >= 1 & tempRowInt <= 8 & tempColInt >= 1 & tempRowInt <= 8){
-                        // Check if there's a piece in the way
-                        ChessPosition candidatePosition = new ChessPosition(tempRowInt, tempColInt);
-                        boolean pieceAtPosition = false; // This will be the default
-                        if (board.getPiece(candidatePosition) != null){
-                            pieceAtPosition = true;
-                            // Check if it's an enemy piece
-                            ChessPiece myPiece = board.getPiece(myPosition);
-                            ChessPiece otherPiece = board.getPiece(candidatePosition);
-                            if (myPiece.getTeamColor() == otherPiece.getTeamColor()){
-                                break; // Don't capture your own piece. That would be silly.
-                            }
-                        }
-                        // Add move to list
-                        ChessMove validMove = new ChessMove(myPosition, candidatePosition, null);
-                        moveCollection.add(validMove);
-                        // If you captured an enemy piece, stop here
-                        if (pieceAtPosition){
-                            break;
-                        }
-                        else{
-                            // Update integers for next position check
-                            tempRowInt = tempRowInt + hMove;
-                            tempColInt = tempColInt + vMove;
-                        }
-                    }
-                }
-            }
+            moveCollection = findMoves(myPosition, board, horizontalMoves, verticalMoves);
         }
         return moveCollection;
     }
 
     // Helper and Override Methods
 
-
+    private Collection<ChessMove> findMoves(ChessPosition myPosition, ChessBoard board, List<Integer> horizontalMoves, List<Integer> verticalMoves){
+        List<ChessMove> moveCollection = new ArrayList<>();
+        int startRow = myPosition.getRow();
+        int startCol = myPosition.getColumn();
+        // Starting from the current position, iterate through all possible next positions and add to list
+        for (var hMove : horizontalMoves){
+            for (var vMove : verticalMoves){
+                int tempRowInt = startRow + hMove;
+                int tempColInt = startCol + vMove;
+                // Check if move is out of bounds (Row and Col positions must be b/t 1 and 8)
+                while (tempRowInt >= 1 & tempRowInt <= 8 & tempColInt >= 1 & tempRowInt <= 8){
+                    // Check if there's a piece in the way
+                    ChessPosition candidatePosition = new ChessPosition(tempRowInt, tempColInt);
+                    boolean pieceAtPosition = false; // This will be the default
+                    if (board.getPiece(candidatePosition) != null){
+                        pieceAtPosition = true;
+                        // Check if it's an enemy piece
+                        ChessPiece myPiece = board.getPiece(myPosition);
+                        ChessPiece otherPiece = board.getPiece(candidatePosition);
+                        if (myPiece.getTeamColor() == otherPiece.getTeamColor()){
+                            break; // Don't capture your own piece. That would be silly.
+                        }
+                    }
+                    // Add move to list
+                    ChessMove validMove = new ChessMove(myPosition, candidatePosition, null);
+                    moveCollection.add(validMove);
+                    // If you captured an enemy piece, stop here
+                    if (pieceAtPosition){
+                        break;
+                    }
+                    else{
+                        // Update integers for next position check
+                        tempRowInt = tempRowInt + hMove;
+                        tempColInt = tempColInt + vMove;
+                    }
+                }
+            }
+        }
+        return moveCollection;
+    }
 
     @Override
     public String toString() {
