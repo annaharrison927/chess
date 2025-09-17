@@ -60,6 +60,10 @@ public class ChessPiece {
             moveCollection = findKingMoves(myPosition, board);
         } else if (piece.getPieceType() == PieceType.KNIGHT) {
             moveCollection = findKnightMoves(myPosition, board);
+        } else if (piece.getPieceType() == PieceType.ROOK) {
+            moveCollection = findRookMoves(myPosition, board);
+        } else if (piece.getPieceType() == PieceType.QUEEN) {
+            moveCollection = findQueenMoves(myPosition, board);
         }
         return moveCollection;
     }
@@ -75,6 +79,20 @@ public class ChessPiece {
         candidatePositions.addAll(loopThroughPositions(myPosition, board, -1, 1, "diagonal"));
         candidatePositions.addAll(loopThroughPositions(myPosition, board, 1, -1, "diagonal"));
         candidatePositions.addAll(loopThroughPositions(myPosition, board, 1, 1, "diagonal"));
+
+        return makeValidMoveCollection(myPosition, board, candidatePositions);
+    }
+
+    private Collection<ChessMove> findRookMoves(ChessPosition myPosition, ChessBoard board){
+        Collection<ChessPosition> candidatePositions = new ArrayList<>();
+
+        // Find horizontal moves
+        candidatePositions.addAll(loopThroughPositions(myPosition, board, -1, 0, "horizontal"));
+        candidatePositions.addAll(loopThroughPositions(myPosition, board, 1, 0, "horizontal"));
+
+        // Find vertical moves
+        candidatePositions.addAll(loopThroughPositions(myPosition, board, 0, -1, "vertical"));
+        candidatePositions.addAll(loopThroughPositions(myPosition, board, 0, 1, "vertical"));
 
         return makeValidMoveCollection(myPosition, board, candidatePositions);
     }
@@ -129,6 +147,27 @@ public class ChessPiece {
 
         ChessPosition tempPosition8 = moveHorizontal(myPosition, 2);
         candidatePositions.add(moveVertical(tempPosition8, 1));
+
+        return makeValidMoveCollection(myPosition, board, candidatePositions);
+    }
+
+    private Collection<ChessMove> findQueenMoves(ChessPosition myPosition, ChessBoard board){
+        Collection<ChessPosition> candidatePositions = new ArrayList<>();
+
+        // MAKE THIS MORE EFFICIENT LATER, THIS REPEATS A LOT OF STUFF
+        // Find diagonal moves
+        candidatePositions.addAll(loopThroughPositions(myPosition, board, -1, -1, "diagonal"));
+        candidatePositions.addAll(loopThroughPositions(myPosition, board, -1, 1, "diagonal"));
+        candidatePositions.addAll(loopThroughPositions(myPosition, board, 1, -1, "diagonal"));
+        candidatePositions.addAll(loopThroughPositions(myPosition, board, 1, 1, "diagonal"));
+
+        // Find horizontal moves
+        candidatePositions.addAll(loopThroughPositions(myPosition, board, -1, 0, "horizontal"));
+        candidatePositions.addAll(loopThroughPositions(myPosition, board, 1, 0, "horizontal"));
+
+        // Find vertical moves
+        candidatePositions.addAll(loopThroughPositions(myPosition, board, 0, -1, "vertical"));
+        candidatePositions.addAll(loopThroughPositions(myPosition, board, 0, 1, "vertical"));
 
         return makeValidMoveCollection(myPosition, board, candidatePositions);
     }
