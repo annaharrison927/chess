@@ -1,9 +1,6 @@
 package chess;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Represents a single chess piece
@@ -16,7 +13,7 @@ public class ChessPiece {
     private final ChessGame.TeamColor pieceColor;
     private final PieceType type;
 
-    public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+    public ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
     }
@@ -56,72 +53,144 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
-        Collection<ChessMove> moveCollection;
-        List<Integer> horizontalMoves = null;
-        List<Integer> verticalMoves = null;
-        boolean goToEndOfBoard = true;
+        Collection<ChessMove> moveCollection = new ArrayList<>();
         if (piece.getPieceType() == PieceType.BISHOP) {
-            // Bishop can move any diagonal direction as long as the path isn't blocked
-            horizontalMoves = List.of(-1, 1);
-            verticalMoves = List.of(-1, 1);
+            moveCollection = findBishopMoves(myPosition, board);
         } else if (piece.getPieceType() == PieceType.KING) {
-            // King can move in any diagonal, vertical, or horizontal position that's 1 away
-            goToEndOfBoard = false;
-            horizontalMoves = List.of(-1, 0, 1);
-            verticalMoves = List.of(-1, 0, 1);
+            moveCollection = findKingMoves(myPosition, board);
         }
-        moveCollection = findMoves(myPosition, board, horizontalMoves, verticalMoves, goToEndOfBoard);
         return moveCollection;
     }
 
-    // Helper and Override Methods
+    // HELPER METHODS
 
-    private Collection<ChessMove> findMoves(ChessPosition myPosition, ChessBoard board, List<Integer> horizontalMoves, List<Integer> verticalMoves, boolean goToEndOfBoard){
-        List<ChessMove> moveCollection = new ArrayList<>();
-        int startRow = myPosition.getRow();
-        int startCol = myPosition.getColumn();
-        // Starting from the current position, iterate through all possible next positions and add to list
-        for (var hMove : horizontalMoves){
-            for (var vMove : verticalMoves){
-                int tempRowInt = startRow + hMove;
-                int tempColInt = startCol + vMove;
-                // Check if move is out of bounds (Row and Col positions must be b/t 1 and 8)
-                while (tempRowInt >= 1 & tempRowInt <= 8 & tempColInt >= 1 & tempColInt <= 8){
-                    // Check if there's a piece in the way
-                    ChessPosition candidatePosition = new ChessPosition(tempRowInt, tempColInt);
-                    boolean pieceAtPosition = false; // This will be the default
-                    if (board.getPiece(candidatePosition) != null){
-                        pieceAtPosition = true;
-                        // Check if it's an enemy piece
-                        ChessPiece myPiece = board.getPiece(myPosition);
-                        ChessPiece otherPiece = board.getPiece(candidatePosition);
-                        if (myPiece.getTeamColor() == otherPiece.getTeamColor()){
-                            break; // Don't capture your own piece. That would be silly.
-                        }
+    // Returns valid Bishop moves
+    private Collection<ChessMove> findBishopMoves(ChessPosition myPosition, ChessBoard board){
+        Collection<ChessPosition> candidatePositions = new ArrayList<>();
+
+        // Find diagonal moves (use loop since Bishop can move until blocked)
+        candidatePositions.addAll(loopThroughPositions(myPosition, board, -1, -1, "diagonal"));
+        candidatePositions.addAll(loopThroughPositions(myPosition, board, -1, 1, "diagonal"));
+        candidatePositions.addAll(loopThroughPositions(myPosition, board, 1, -1, "diagonal"));
+        candidatePositions.addAll(loopThroughPositions(myPosition, board, 1, 1, "diagonal"));
+
+        return makeValidMoveCollection(myPosition, board, candidatePositions);
+    }
+
+    // Returns valid King moves
+    private Collection<ChessMove> findKingMoves(ChessPosition myPosition, ChessBoard board){
+        Collection<ChessPosition> candidatePositions = new ArrayList<>();
+
+        // Find diagonal moves
+        candidatePositions.add(moveDiagonal(myPosition, -1, -1));
+        candidatePositions.add(moveDiagonal(myPosition, -1, 1));
+        candidatePositions.add(moveDiagonal(myPosition, 1, -1));
+        candidatePositions.add(moveDiagonal(myPosition, 1, 1));
+
+        // Find horizontal moves
+        candidatePositions.add(moveHorizontal(myPosition, -1));
+        candidatePositions.add(moveHorizontal(myPosition, 1));
+
+        // Find vertical moves
+        candidatePositions.add(moveVertical(myPosition, -1));
+        candidatePositions.add(moveVertical(myPosition, 1));
+
+        return makeValidMoveCollection(myPosition, board, candidatePositions);
+    }
+
+    // Returns position after moving diagonally
+    private ChessPosition moveDiagonal(ChessPosition myPosition, int hMove, int vMove){
+        int myRow = myPosition.getRow();
+        int myCol = myPosition.getColumn();
+
+        return new ChessPosition(myRow + hMove, myCol + vMove);
+    }
+
+    // Returns position after moving horizontally
+    private ChessPosition moveHorizontal(ChessPosition myPosition, int hMove){
+        int myRow = myPosition.getRow();
+        int myCol = myPosition.getColumn();
+
+        return new ChessPosition(myRow + hMove, myCol);
+    }
+
+    // Returns position after moving vertically
+    private ChessPosition moveVertical(ChessPosition myPosition, int vMove){
+        int myRow = myPosition.getRow();
+        int myCol = myPosition.getColumn();
+
+        return new ChessPosition(myRow, myCol + vMove);
+    }
+
+    // For pieces that can move until blocked, this loop finds all possible moves in the direction it's going
+    private Collection<ChessPosition> loopThroughPositions(ChessPosition myPosition, ChessBoard board, int hMove, int vMove, String moveType){
+        Collection<ChessPosition> candidatePositions = new ArrayList<>();
+        ChessPosition currentPosition = myPosition;
+        while (true){
+            ChessPosition candidatePosition = null;
+            // Create position based on move type
+            if (Objects.equals(moveType, "diagonal")){
+                candidatePosition = moveDiagonal(currentPosition, hMove, vMove);
+            } else if (Objects.equals(moveType, "horizontal")) {
+                candidatePosition = moveHorizontal(currentPosition, hMove);
+            } else if (Objects.equals(moveType, "vertical")) {
+                candidatePosition = moveVertical(currentPosition, vMove);
+            }
+            // Check if in bounds
+            if (!checkIfInBounds(candidatePosition.getRow(), candidatePosition.getColumn())){
+                break;
+            }
+            // Check if position is occupied
+            else if (board.getPiece(candidatePosition) != null) {
+                // Check if enemy piece
+                if (checkIfEnemy(board, myPosition, candidatePosition)){
+                    candidatePositions.add(candidatePosition);
+                }
+                break;
+            }
+            else{
+                candidatePositions.add(candidatePosition);
+                currentPosition = candidatePosition;
+            }
+        }
+        return candidatePositions;
+    }
+
+    // Returns valid moves based on valid end positions
+    private Collection<ChessMove> makeValidMoveCollection(ChessPosition myPosition, ChessBoard board, Collection<ChessPosition> candidatePositions){
+        Collection<ChessMove> validMoves = new ArrayList<>();
+        for (var candidatePosition : candidatePositions){
+            ChessMove candidateMove = new ChessMove(myPosition, candidatePosition, null);
+            // Make sure piece isn't out of bounds
+            if (checkIfInBounds(candidatePosition.getRow(), candidatePosition.getColumn())){
+                // Check if the piece is open or occupied by an enemy
+                if (board.getPiece(candidatePosition) != null){
+                    // Add position if enemy piece is there
+                    if (checkIfEnemy(board, myPosition, candidatePosition)){
+                        validMoves.add(candidateMove);
                     }
-                    // Add move to list
-                    ChessMove validMove = new ChessMove(myPosition, candidatePosition, null);
-                    moveCollection.add(validMove);
-                    // If the piece has limited mobility (e.g., a king), stop here
-                    if (!goToEndOfBoard){
-                        break;
-                    }
-                    else{
-                        // If you captured an enemy piece, stop here
-                        if (pieceAtPosition){
-                            break;
-                        }
-                        else{
-                            // Update integers for next position check
-                            tempRowInt = tempRowInt + hMove;
-                            tempColInt = tempColInt + vMove;
-                        }
-                    }
+                }
+                else{
+                    validMoves.add(candidateMove);
                 }
             }
         }
-        return moveCollection;
+        return validMoves;
     }
+
+    // Checks if a piece at a given position is an enemy
+    private boolean checkIfEnemy(ChessBoard board, ChessPosition myPosition, ChessPosition endPos){
+        ChessPiece myPiece = board.getPiece(myPosition);
+        ChessPiece otherPiece = board.getPiece(endPos);
+        return myPiece.getTeamColor() != otherPiece.getTeamColor(); // Don't capture your own piece. That would be silly.
+    }
+
+    // Makes sure piece doesn't go out of bounds
+    private boolean checkIfInBounds(int rowInt, int colInt){
+        return rowInt >= 1 & rowInt <= 8 & colInt >= 1 & colInt <= 8;
+    }
+
+    // OVERRIDE METHODS
 
     @Override
     public String toString() {
