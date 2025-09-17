@@ -58,6 +58,8 @@ public class ChessPiece {
             moveCollection = findBishopMoves(myPosition, board);
         } else if (piece.getPieceType() == PieceType.KING) {
             moveCollection = findKingMoves(myPosition, board);
+        } else if (piece.getPieceType() == PieceType.KNIGHT) {
+            moveCollection = findKnightMoves(myPosition, board);
         }
         return moveCollection;
     }
@@ -94,6 +96,39 @@ public class ChessPiece {
         // Find vertical moves
         candidatePositions.add(moveVertical(myPosition, -1));
         candidatePositions.add(moveVertical(myPosition, 1));
+
+        return makeValidMoveCollection(myPosition, board, candidatePositions);
+    }
+
+    // Return valid Knight moves
+    private Collection<ChessMove> findKnightMoves(ChessPosition myPosition, ChessBoard board){
+        Collection<ChessPosition> candidatePositions = new ArrayList<>();
+
+        // This accounts for all 8 possible positions a knight can go to
+        // Kind of redundant but this will do for now
+        ChessPosition tempPosition1 = moveHorizontal(myPosition, -2);
+        candidatePositions.add(moveVertical(tempPosition1, -1));
+
+        ChessPosition tempPosition2 = moveHorizontal(myPosition, -2);
+        candidatePositions.add(moveVertical(tempPosition2, 1));
+
+        ChessPosition tempPosition3 = moveHorizontal(myPosition, -1);
+        candidatePositions.add(moveVertical(tempPosition3, -2));
+
+        ChessPosition tempPosition4 = moveHorizontal(myPosition, -1);
+        candidatePositions.add(moveVertical(tempPosition4, 2));
+
+        ChessPosition tempPosition5 = moveHorizontal(myPosition, 1);
+        candidatePositions.add(moveVertical(tempPosition5, -2));
+
+        ChessPosition tempPosition6 = moveHorizontal(myPosition, 1);
+        candidatePositions.add(moveVertical(tempPosition6, 2));
+
+        ChessPosition tempPosition7 = moveHorizontal(myPosition, 2);
+        candidatePositions.add(moveVertical(tempPosition7, -1));
+
+        ChessPosition tempPosition8 = moveHorizontal(myPosition, 2);
+        candidatePositions.add(moveVertical(tempPosition8, 1));
 
         return makeValidMoveCollection(myPosition, board, candidatePositions);
     }
