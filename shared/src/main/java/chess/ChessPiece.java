@@ -64,6 +64,8 @@ public class ChessPiece {
             moveCollection = findRookMoves(myPosition, board);
         } else if (piece.getPieceType() == PieceType.QUEEN) {
             moveCollection = findQueenMoves(myPosition, board);
+        } else if (piece.getPieceType() == PieceType.PAWN) {
+            moveCollection = findPawnMoves(myPosition, board);
         }
         return moveCollection;
     }
@@ -170,6 +172,64 @@ public class ChessPiece {
         candidatePositions.addAll(loopThroughPositions(myPosition, board, 0, 1, "vertical"));
 
         return makeValidMoveCollection(myPosition, board, candidatePositions);
+    }
+
+    private Collection<ChessMove> findPawnMoves(ChessPosition myPosition, ChessBoard board){
+        Collection<ChessMove> validPawnMoves = new ArrayList<>();
+
+        Collection<ChessPosition> candidateVPositions = new ArrayList<>();
+        Collection<ChessPosition> candidateDPositions = new ArrayList<>();
+
+        int vMove;
+        int extraVMove = 0;
+
+        // Check piece color
+        ChessPiece myPiece = board.getPiece(myPosition);
+        if (myPiece.getTeamColor() == ChessGame.TeamColor.BLACK){
+            vMove = -1;
+            int startRow = 7;
+            if (myPosition.getRow() == startRow){
+                extraVMove = -2;
+            }
+        }
+        else{
+            vMove = 1;
+            int startRow = 2;
+            if (myPosition.getRow() == startRow){
+                extraVMove = 2;
+            }
+        }
+
+        // Check forward move(s)
+        ChessPosition candidateVPosition = moveVertical(myPosition, vMove);
+        if (checkIfInBounds(candidateVPosition.getRow(), candidateVPosition.getColumn()) & board.getPiece(candidateVPosition) == null){
+            candidateVPositions.add(candidateVPosition);
+            if (extraVMove == -2 | extraVMove == 2){
+                ChessPosition candidateExtraPosition = moveVertical(myPosition, extraVMove);
+                if (checkIfInBounds(candidateExtraPosition.getRow(), candidateExtraPosition.getColumn()) & board.getPiece(candidateVPosition) == null){
+                    candidateVPositions.add(candidateExtraPosition);
+                }
+            }
+        }
+        for (var pos : candidateVPositions){
+            ChessMove candidateMove = new ChessMove(myPosition, pos, null);
+            validPawnMoves.add(candidateMove);
+        }
+
+        // Check diagonal moves
+        candidateDPositions.add(moveDiagonal(myPosition, -1, vMove));
+        candidateDPositions.add(moveDiagonal(myPosition, 1, vMove));
+
+        for (var pos : candidateDPositions){
+            if (board.getPiece(pos) != null){
+                if (checkIfEnemy(board, myPosition, pos)){
+                    ChessMove candidateMove = new ChessMove(myPosition, pos, null);
+                    validPawnMoves.add(candidateMove);
+                }
+            }
+        }
+
+        return validPawnMoves;
     }
 
     // Returns position after moving diagonally
