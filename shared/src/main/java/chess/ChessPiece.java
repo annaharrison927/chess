@@ -188,6 +188,7 @@ public class ChessPiece {
         if (myPiece.getTeamColor() == ChessGame.TeamColor.BLACK){
             vMove = -1;
             int startRow = 7;
+            // Check if starting move
             if (myPosition.getRow() == startRow){
                 extraVMove = -2;
             }
@@ -195,6 +196,7 @@ public class ChessPiece {
         else{
             vMove = 1;
             int startRow = 2;
+            // Check if starting move
             if (myPosition.getRow() == startRow){
                 extraVMove = 2;
             }
@@ -202,29 +204,50 @@ public class ChessPiece {
 
         // Check forward move(s)
         ChessPosition candidateVPosition = moveVertical(myPosition, vMove);
+        // Make sure it's in bounds and not blocked
         if (checkIfInBounds(candidateVPosition.getRow(), candidateVPosition.getColumn()) & board.getPiece(candidateVPosition) == null){
-            candidateVPositions.add(candidateVPosition);
+            // Check if it's a promotion piece
+            if (candidateVPosition.getRow() == 1 | candidateVPosition.getRow() == 8){
+                validPawnMoves.addAll(getPromotionMoves(myPosition, candidateVPosition));
+            }
+            else{
+                candidateVPositions.add(candidateVPosition);
+            }
+            // Check if starting move
             if (extraVMove == -2 | extraVMove == 2){
                 ChessPosition candidateExtraPosition = moveVertical(myPosition, extraVMove);
-                if (checkIfInBounds(candidateExtraPosition.getRow(), candidateExtraPosition.getColumn()) & board.getPiece(candidateVPosition) == null){
+                // Make sure it's in bounds and not blocked
+                if (checkIfInBounds(candidateExtraPosition.getRow(), candidateExtraPosition.getColumn()) & board.getPiece(candidateExtraPosition) == null){
                     candidateVPositions.add(candidateExtraPosition);
                 }
             }
         }
-        for (var pos : candidateVPositions){
-            ChessMove candidateMove = new ChessMove(myPosition, pos, null);
-            validPawnMoves.add(candidateMove);
+
+        // Add candidate moves is candidate position list isn't empty
+        if (!candidateVPositions.isEmpty()){
+            for (var pos : candidateVPositions){
+                ChessMove candidateMove = new ChessMove(myPosition, pos, null);
+                validPawnMoves.add(candidateMove);
+            }
         }
+
 
         // Check diagonal moves
         candidateDPositions.add(moveDiagonal(myPosition, -1, vMove));
         candidateDPositions.add(moveDiagonal(myPosition, 1, vMove));
 
         for (var pos : candidateDPositions){
-            if (board.getPiece(pos) != null){
+            // Make sure it's in bounds and there is an enemy to capture
+            if (checkIfInBounds(pos.getRow(), pos.getColumn()) && board.getPiece(pos) != null){
                 if (checkIfEnemy(board, myPosition, pos)){
-                    ChessMove candidateMove = new ChessMove(myPosition, pos, null);
-                    validPawnMoves.add(candidateMove);
+                    // Check if promotion piece
+                    if (pos.getRow() == 1 | pos.getRow() == 8){
+                        validPawnMoves.addAll(getPromotionMoves(myPosition, pos));
+                    }
+                    else{
+                        ChessMove candidateMove = new ChessMove(myPosition, pos, null);
+                        validPawnMoves.add(candidateMove);
+                    }
                 }
             }
         }
@@ -232,16 +255,27 @@ public class ChessPiece {
         return validPawnMoves;
     }
 
+    private Collection<ChessMove> getPromotionMoves(ChessPosition myPosition, ChessPosition candidatePosition){
+        Collection<ChessMove> validPromotionMoves = new ArrayList<>();
+
+        validPromotionMoves.add(new ChessMove(myPosition, candidatePosition, PieceType.QUEEN));
+        validPromotionMoves.add(new ChessMove(myPosition, candidatePosition, PieceType.BISHOP));
+        validPromotionMoves.add(new ChessMove(myPosition, candidatePosition, PieceType.ROOK));
+        validPromotionMoves.add(new ChessMove(myPosition, candidatePosition, PieceType.KNIGHT));
+
+        return validPromotionMoves;
+    }
+
     // Returns position after moving diagonally
     private ChessPosition moveDiagonal(ChessPosition myPosition, int hMove, int vMove){
         int myRow = myPosition.getRow();
         int myCol = myPosition.getColumn();
 
-        return new ChessPosition(myRow + hMove, myCol + vMove);
+        return new ChessPosition(myRow + vMove, myCol + hMove);
     }
 
     // Returns position after moving horizontally
-    private ChessPosition moveHorizontal(ChessPosition myPosition, int hMove){
+    private ChessPosition moveVertical(ChessPosition myPosition, int hMove){
         int myRow = myPosition.getRow();
         int myCol = myPosition.getColumn();
 
@@ -249,7 +283,7 @@ public class ChessPiece {
     }
 
     // Returns position after moving vertically
-    private ChessPosition moveVertical(ChessPosition myPosition, int vMove){
+    private ChessPosition moveHorizontal(ChessPosition myPosition, int vMove){
         int myRow = myPosition.getRow();
         int myCol = myPosition.getColumn();
 
