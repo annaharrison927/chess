@@ -22,7 +22,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        board[position.getRow()-1][position.getColumn()-1] = piece;
+        board[position.getRow() - 1][position.getColumn() -1] = piece;
         // Java starts with 0, but our board starts with 1
     }
 
@@ -42,13 +42,57 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        // Add pawns
+        ChessPiece whitePawn = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
+        addPawnsToBoard(2, whitePawn);
+        ChessPiece blackPawn = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
+        addPawnsToBoard(7, blackPawn);
+
+        // Add Rooks
+        addOtherPieces(1, 1, 8, ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
+        addOtherPieces(8, 1, 8, ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
+
+        // Add Knights
+        addOtherPieces(1, 2, 7, ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
+        addOtherPieces(8, 2, 7, ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
+
+        // Add Bishops
+        addOtherPieces(1, 3, 6, ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
+        addOtherPieces(8, 3, 6, ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
+
+        // Add Kings
+        addOtherPieces(1, 5, 0, ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING);
+        addOtherPieces(8, 5, 0, ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING);
+
+        // Add Queens
+        addOtherPieces(1, 4, 0, ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN);
+        addOtherPieces(8, 4, 0, ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN);
     }
+
+    private void addPawnsToBoard (int rowNum, ChessPiece piece){
+        for (int i = 1; i <= 8; i++){
+            ChessPosition currentPosition = new ChessPosition(rowNum, i);
+            addPiece(currentPosition, piece);
+        }
+    }
+
+    private void addOtherPieces(int startRow, int pos1, int pos2, ChessGame.TeamColor color, ChessPiece.PieceType type){
+        ChessPiece piece1 = new ChessPiece(color, type);
+        ChessPosition position1 = new ChessPosition(startRow, pos1);
+        addPiece(position1, piece1);
+
+        if (pos2 != 0){
+            ChessPiece piece2 = new ChessPiece(color, type);
+            ChessPosition position2 = new ChessPosition(startRow, pos2);
+            addPiece(position2, piece2);
+        }
+    }
+
 
     @Override
     public String toString() {
         return "ChessBoard{" +
-                "board=" + Arrays.toString(board) +
+                "board=" + Arrays.deepToString(board) +
                 '}';
     }
 
