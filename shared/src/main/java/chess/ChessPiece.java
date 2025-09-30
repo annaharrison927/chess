@@ -51,7 +51,7 @@ public class ChessPiece {
      *
      * @return Collection of valid moves
      */
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+    public static Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> validMoves = new ArrayList<>();
         ChessPiece myPiece = board.getPiece(myPosition);
 
@@ -78,7 +78,7 @@ public class ChessPiece {
     }
 
     // HELPER METHODS
-    private Collection<ChessMove> getBishopMoves(ChessBoard board, ChessPosition myPosition){
+    private static Collection<ChessMove> getBishopMoves(ChessBoard board, ChessPosition myPosition){
         Collection<ChessMove> validMoves = new ArrayList<>();
 
         validMoves.addAll(getValidMoves(board, myPosition, -1, -1, 8));
@@ -89,7 +89,7 @@ public class ChessPiece {
         return validMoves;
     }
 
-    private Collection<ChessMove> getKingMoves(ChessBoard board, ChessPosition myPosition){
+    private static Collection<ChessMove> getKingMoves(ChessBoard board, ChessPosition myPosition){
         Collection<ChessMove> validMoves = new ArrayList<>();
 
         // Diagonal Moves
@@ -107,7 +107,7 @@ public class ChessPiece {
         return validMoves;
     }
 
-    private Collection<ChessMove> getKnightMoves(ChessBoard board, ChessPosition myPosition){
+    private static Collection<ChessMove> getKnightMoves(ChessBoard board, ChessPosition myPosition){
         Collection<ChessMove> validMoves = new ArrayList<>();
 
         validMoves.addAll(getValidMoves(board, myPosition, -2, -1, 1));
@@ -123,7 +123,7 @@ public class ChessPiece {
         return validMoves;
     }
 
-    private Collection<ChessMove> getRookMoves(ChessBoard board, ChessPosition myPosition){
+    private static Collection<ChessMove> getRookMoves(ChessBoard board, ChessPosition myPosition){
         Collection<ChessMove> validMoves = new ArrayList<>();
 
         validMoves.addAll(getValidMoves(board, myPosition, 0, -1, 8));
@@ -134,7 +134,7 @@ public class ChessPiece {
         return validMoves;
     }
 
-    private Collection<ChessMove> getQueenMoves(ChessBoard board, ChessPosition myPosition){
+    private static Collection<ChessMove> getQueenMoves(ChessBoard board, ChessPosition myPosition){
         Collection<ChessMove> validMoves = new ArrayList<>();
 
         // Diagonal Moves
@@ -152,7 +152,7 @@ public class ChessPiece {
         return validMoves;
     }
 
-    private Collection<ChessMove> getPawnMoves(ChessBoard board, ChessPosition myPosition){
+    private static Collection<ChessMove> getPawnMoves(ChessBoard board, ChessPosition myPosition){
         Collection<ChessMove> validMoves = new ArrayList<>();
 
         // GET PARAMETERS BASED ON COLOR
@@ -208,7 +208,7 @@ public class ChessPiece {
         return validMoves;
     }
 
-    private Collection<ChessMove> getValidPawnCaptureMoves(ChessBoard board, ChessPosition myPosition, ChessPosition candidatePosition, int promoRow){
+    private static Collection<ChessMove> getValidPawnCaptureMoves(ChessBoard board, ChessPosition myPosition, ChessPosition candidatePosition, int promoRow){
         Collection<ChessMove> validMoves = new ArrayList<>();
 
         // Check if in bounds, position is occupied, and has an enemy piece to capture
@@ -226,7 +226,7 @@ public class ChessPiece {
         return validMoves;
     }
 
-    private Collection<ChessMove> getValidPromotionMoves(ChessPosition myPosition, ChessPosition candidatePosition){
+    private static Collection<ChessMove> getValidPromotionMoves(ChessPosition myPosition, ChessPosition candidatePosition){
         Collection<ChessMove> validMoves = new ArrayList<>();
 
         validMoves.add(new ChessMove(myPosition, candidatePosition, PieceType.QUEEN));
@@ -237,7 +237,7 @@ public class ChessPiece {
         return validMoves;
     }
 
-    private Collection<ChessMove> getValidMoves(ChessBoard board, ChessPosition myPosition, int hMove, int vMove, int moveLimit){
+    private static Collection<ChessMove> getValidMoves(ChessBoard board, ChessPosition myPosition, int hMove, int vMove, int moveLimit){
         // Does not apply to pawns
         Collection<ChessMove> validMoves = new ArrayList<>();
         int movesMade = 0;
@@ -272,18 +272,18 @@ public class ChessPiece {
         return validMoves;
     }
 
-    private ChessPosition getCandidatePosition(ChessPosition myPosition, int hMove, int vMove){
+    private static ChessPosition getCandidatePosition(ChessPosition myPosition, int hMove, int vMove){
         return new ChessPosition(myPosition.getRow() + vMove, myPosition.getColumn() + hMove);
     }
 
-    private boolean checkIfInBounds(ChessPosition candidatePosition){
+    private static boolean checkIfInBounds(ChessPosition candidatePosition){
         return (candidatePosition.getRow() >= 1 &&
                 candidatePosition.getRow() <= 8 &&
                 candidatePosition.getColumn() >= 1 &&
                 candidatePosition.getColumn() <= 8);
     }
 
-    private boolean checkIfEnemy(ChessBoard board, ChessPosition myPosition, ChessPosition candidatePosition){
+    private static boolean checkIfEnemy(ChessBoard board, ChessPosition myPosition, ChessPosition candidatePosition){
         ChessPiece myPiece = board.getPiece(myPosition);
         ChessPiece otherPiece = board.getPiece(candidatePosition);
 
