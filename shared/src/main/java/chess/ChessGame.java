@@ -18,6 +18,7 @@ public class ChessGame {
     public ChessGame() {
         this.team = TeamColor.WHITE;
         this.board = new ChessBoard();
+        this.board.resetBoard();
     }
 
     /**
@@ -231,7 +232,7 @@ public class ChessGame {
             while (j <= 8){
                 ChessPosition candidatePosition = new ChessPosition(i, j);
                 ChessPiece candidatePiece = board.getPiece(candidatePosition);
-                if (candidatePiece == myKingPiece){
+                if (candidatePiece.equals(myKingPiece)){
                     myKingPosition = candidatePosition;
                 }
                 j++;
@@ -285,6 +286,7 @@ public class ChessGame {
     public String toString() {
         return "ChessGame{" +
                 "team=" + team +
+                ", board=" + board +
                 '}';
     }
 
@@ -294,11 +296,11 @@ public class ChessGame {
             return false;
         }
         ChessGame chessGame = (ChessGame) o;
-        return team == chessGame.team;
+        return team == chessGame.team && Objects.equals(board, chessGame.board);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(team);
+        return Objects.hash(team, board);
     }
 }
