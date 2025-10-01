@@ -113,6 +113,9 @@ public class ChessGame {
         if (myPiece.getTeamColor() != getTeamTurn()){
             throw new InvalidMoveException("Not your turn!");
         }
+        if (move.getPromotionPiece() == ChessPiece.PieceType.PAWN || move.getPromotionPiece() == ChessPiece.PieceType.KING){
+            throw new InvalidMoveException("Invalid promotion!");
+        }
         // I know this is a POLA violation but oh well. Move the piece
         board.addPiece(startPosition, null);
         board.addPiece(endPosition, myPiece);
