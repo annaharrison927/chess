@@ -110,6 +110,13 @@ public class ChessGame {
             throw new InvalidMoveException("Invalid move");
         }
         ChessPiece myPiece = board.getPiece(startPosition);
+        // Change piece for promotion moves
+        if (myPiece.getPieceType() == ChessPiece.PieceType.PAWN){
+            if ((myPiece.getTeamColor() == TeamColor.WHITE && endPosition.getRow() == 8) ||
+                    (myPiece.getTeamColor() == TeamColor.BLACK && endPosition.getRow() == 1)){
+                myPiece = new ChessPiece(myPiece.getTeamColor(), move.getPromotionPiece());
+            }
+        }
         if (myPiece.getTeamColor() != getTeamTurn()){
             throw new InvalidMoveException("Not your turn!");
         }
