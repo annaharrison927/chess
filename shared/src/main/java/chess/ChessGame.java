@@ -103,6 +103,9 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPosition startPosition = move.getStartPosition();
         ChessPosition endPosition = move.getEndPosition();
+        if (board.getPiece(startPosition) == null){
+            throw new InvalidMoveException("No piece to move!");
+        }
         if (!validMoves(startPosition).contains(move)){
             throw new InvalidMoveException("Invalid move");
         }
@@ -142,7 +145,7 @@ public class ChessGame {
     private boolean hasDiagonalThreats(TeamColor teamColor){
         ChessPosition myKingPosition = getKingPosition(teamColor);
 
-        // Check if there are pawns that can capture the king
+        // Check if there are pawns or king that can capture the king
         Collection<ChessPiece> enemyShortPieces = new ArrayList<>();
 
         enemyShortPieces.add(getEnemyPiece(board, myKingPosition, -1, -1, 1));
@@ -151,6 +154,8 @@ public class ChessGame {
         enemyShortPieces.add(getEnemyPiece(board, myKingPosition, 1, 1, 1));
 
         if (checkIfThreat(enemyShortPieces, ChessPiece.PieceType.PAWN)){
+            return true;
+        } else if (checkIfThreat(enemyShortPieces, ChessPiece.PieceType.KING)) {
             return true;
         }
 
@@ -179,9 +184,21 @@ public class ChessGame {
 
         if (checkIfThreat(enemyPieces, ChessPiece.PieceType.QUEEN)){
             return true;
-        } else{
-            return checkIfThreat(enemyPieces, ChessPiece.PieceType.ROOK);
+        } else if (checkIfThreat(enemyPieces, ChessPiece.PieceType.ROOK)) {
+            return true;
         }
+
+        Collection<ChessPiece> enemyKingPieces = new ArrayList<>();
+
+        // Check if there are kings in horizontal/vertical paths
+        enemyKingPieces.add(getEnemyPiece(board, myKingPosition, -1, 0, 1));
+        enemyKingPieces.add(getEnemyPiece(board, myKingPosition, 1, 0, 1));
+        enemyKingPieces.add(getEnemyPiece(board, myKingPosition, 0, -1, 1));
+        enemyKingPieces.add(getEnemyPiece(board, myKingPosition, 0, 1, 1));
+
+        return checkIfThreat(enemyKingPieces, ChessPiece.PieceType.KING);
+
+
     }
 
     private boolean hasKnightThreats(TeamColor teamColor){
