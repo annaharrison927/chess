@@ -30,6 +30,7 @@ public class Server {
         ctx.result("\"username\":\"joe\", \"authToken\":\"xyz\"}");
     }
 
+
     public int run(int desiredPort) {
         server.start(desiredPort);
         return server.port();
