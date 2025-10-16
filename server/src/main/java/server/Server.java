@@ -1,23 +1,18 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.UserDataAccess;
-import dataaccess.MemoryUserDataAccess;
-import model.UserData;
 import io.javalin.*;
 import io.javalin.http.Context;
 import record.RegisterResult;
 import request.RegisterRequest;
-import service.UserService;
+import service.Service;
 
 public class Server {
 
     private final Javalin server;
-    private UserService userService = new UserService();
-    private UserDataAccess dataAccess;
+    private Service userService = new Service();
 
     public Server() {
-        dataAccess = new MemoryUserDataAccess();
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
         // These are just hard coded values!!

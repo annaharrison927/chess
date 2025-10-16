@@ -6,7 +6,7 @@ public interface UserDataAccess {
 
     void addUser(UserData userData);
 
-    void getUser(UserData userData);
+    UserData getUser(UserData userData);
 
     void clear();
 

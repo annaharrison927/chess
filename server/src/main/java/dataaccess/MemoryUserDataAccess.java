@@ -13,8 +13,8 @@ public class MemoryUserDataAccess implements UserDataAccess {
     }
 
     @Override
-    public void getUser(UserData userData) {
-        users.get(userData.username());
+    public UserData getUser(UserData userData) {
+        return users.get(userData.username());
     }
 
     @Override
