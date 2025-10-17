@@ -9,6 +9,7 @@ import dataaccess.UserDataAccess;
 import model.UserData;
 import model.AuthData;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class Service {
@@ -21,12 +22,14 @@ public class Service {
         authDataAccess = new MemoryAuthDataAccess();
     }
 
-    public RegisterResult register(RegisterRequest registerRequest) {
+    public RegisterResult register(RegisterRequest registerRequest) throws AlreadyTakenException, BadRequestException {
         // Create new user data
         UserData newUser = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
         // Check if user is already in the database. If not, add the new user to database
         if (userDataAccess.getUser(newUser) != null) {
-            // Throw Already Taken Exception
+            throw new AlreadyTakenException("Error: User already in database");
+        } else if (Objects.equals(newUser.username(), "")) {
+            throw new BadRequestException("Error: Username is blank");
         }
         userDataAccess.addUser(newUser);
 
