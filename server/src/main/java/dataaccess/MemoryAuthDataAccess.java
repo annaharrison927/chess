@@ -13,8 +13,8 @@ public class MemoryAuthDataAccess implements AuthDataAccess {
     }
 
     @Override
-    public void getAuth(AuthData authData) {
-        auth.get(authData.authToken());
+    public AuthData getAuth(AuthData authData) {
+        return auth.get(authData.authToken());
     }
 
     @Override
