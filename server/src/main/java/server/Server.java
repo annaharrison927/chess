@@ -24,6 +24,7 @@ public class Server {
         server.delete("db", this::clearApplication);
         server.post("user", this::register);
         server.post("session", this::login);
+        server.delete("session", this::logout);
     }
 
     public int run(int desiredPort) {
@@ -67,6 +68,21 @@ public class Server {
             ctx.status(401);
             ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
         }
+    }
+
+    private void logout(Context ctx) {
+        var serializer = new Gson();
+        String reqJson = ctx.header("authorization");
+        LogoutRequest req = serializer.fromJson(reqJson, LogoutRequest.class);
+
+        try {
+            LogoutResult res = service.logout(req);
+            ctx.result(serializer.toJson(res));
+        } catch (DataAccessException ex) {
+            ctx.status(401);
+            ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
+        }
+
     }
 
     private void clearApplication(Context ctx) {

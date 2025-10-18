@@ -64,6 +64,16 @@ public class Service {
         return new LoginResult(user.username(), authToken);
     }
 
+    public LogoutResult logout(LogoutRequest request) throws DataAccessException {
+        String authToken = request.authToken();
+        if (authDataAccess.getAuth(authToken) == null) {
+            throw new DataAccessException("Error: Invalid authToken");
+        }
+        authDataAccess.deleteAuth(authToken);
+
+        return new LogoutResult();
+    }
+
     public ClearApplicationResult clearApplication(ClearApplicationRequest clearApplicationRequest) {
         gameDataAccess.clear();
         userDataAccess.clear();

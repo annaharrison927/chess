@@ -13,12 +13,17 @@ public class MemoryAuthDataAccess implements AuthDataAccess {
     }
 
     @Override
-    public AuthData getAuth(AuthData authData) {
-        return auth.get(authData.authToken());
+    public AuthData getAuth(String authToken) {
+        return auth.get(authToken);
     }
 
     @Override
-    public void deleteAuth(AuthData authData) {
-        auth.remove(authData.authToken());
+    public void deleteAuth(String authToken) {
+        auth.remove(authToken);
+    }
+
+    @Override
+    public void clear() {
+        auth.clear();
     }
 }

@@ -6,7 +6,9 @@ public interface AuthDataAccess {
 
     void addAuth(AuthData authData);
 
-    AuthData getAuth(AuthData authData);
+    AuthData getAuth(String authToken);
 
-    void deleteAuth(AuthData authData);
+    void deleteAuth(String authToken);
+
+    void clear();
 }
