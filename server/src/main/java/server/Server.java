@@ -3,7 +3,9 @@ package server;
 import com.google.gson.Gson;
 import io.javalin.*;
 import io.javalin.http.Context;
-import record.RegisterResult;
+import request.ClearApplicationRequest;
+import result.ClearApplicationResult;
+import result.RegisterResult;
 import request.RegisterRequest;
 import service.AlreadyTakenException;
 import service.BadRequestException;
@@ -14,13 +16,13 @@ import java.util.Map;
 public class Server {
 
     private final Javalin server;
-    private final Service userService = new Service();
+    private final Service service = new Service();
 
     public Server() {
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
         // These are just hard coded values!!
-        server.delete("db", this::delete);
+        server.delete("db", this::clearApplication);
         server.post("user", this::register);
 
         // Register your endpoints and exception handlers here.
@@ -42,7 +44,7 @@ public class Server {
         RegisterRequest req = serializer.fromJson(reqJson, RegisterRequest.class);
         // Call to the service and register
         try {
-            RegisterResult res = userService.register(req);
+            RegisterResult res = service.register(req);
             ctx.result(serializer.toJson(res));
         } catch (AlreadyTakenException ex) {
             ctx.status(403);
@@ -53,7 +55,12 @@ public class Server {
         }
     }
 
-    private void delete(Context ctx) {
+    private void clearApplication(Context ctx) {
+        var serializer = new Gson();
+        String reqJson = ctx.body();
+        ClearApplicationRequest req = serializer.fromJson(reqJson, ClearApplicationRequest.class);
+        ClearApplicationResult res = service.clearApplication(req);
+        ctx.result(serializer.toJson(res));
     }
 
 

@@ -1,11 +1,15 @@
 package service;
 
 import dataaccess.AuthDataAccess;
+import dataaccess.UserDataAccess;
+import dataaccess.GameDataAccess;
 import dataaccess.MemoryAuthDataAccess;
 import dataaccess.MemoryUserDataAccess;
-import record.RegisterResult;
+import dataaccess.MemoryGameDataAccess;
+import request.ClearApplicationRequest;
+import result.ClearApplicationResult;
+import result.RegisterResult;
 import request.RegisterRequest;
-import dataaccess.UserDataAccess;
 import model.UserData;
 import model.AuthData;
 
@@ -15,11 +19,13 @@ import java.util.UUID;
 public class Service {
     private final UserDataAccess userDataAccess;
     private final AuthDataAccess authDataAccess;
+    private final GameDataAccess gameDataAccess;
 
 
     public Service() {
         userDataAccess = new MemoryUserDataAccess();
         authDataAccess = new MemoryAuthDataAccess();
+        gameDataAccess = new MemoryGameDataAccess();
     }
 
     public RegisterResult register(RegisterRequest registerRequest) throws AlreadyTakenException, BadRequestException {
@@ -30,6 +36,10 @@ public class Service {
             throw new AlreadyTakenException("Error: User already in database");
         } else if (Objects.equals(newUser.username(), "")) {
             throw new BadRequestException("Error: Username is blank");
+        } else if (Objects.equals(newUser.password(), null)) {
+            throw new BadRequestException("Error: Please enter a password");
+        } else if (Objects.equals(newUser.email(), null)) {
+            throw new BadRequestException("Error: Please enter a valid email address");
         }
         userDataAccess.addUser(newUser);
 
@@ -40,6 +50,14 @@ public class Service {
 
         // Create register result
         return new RegisterResult(newUser.username(), authToken);
+    }
+
+    public ClearApplicationResult clearApplication(ClearApplicationRequest clearApplicationRequest) {
+        gameDataAccess.clear();
+        userDataAccess.clear();
+        authDataAccess.clear();
+
+        return new ClearApplicationResult();
     }
 
     public static String generateToken() {
