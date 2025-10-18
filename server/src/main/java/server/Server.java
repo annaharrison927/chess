@@ -1,12 +1,11 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import io.javalin.*;
 import io.javalin.http.Context;
-import request.ClearApplicationRequest;
-import result.ClearApplicationResult;
-import result.RegisterResult;
-import request.RegisterRequest;
+import request.*;
+import result.*;
 import service.AlreadyTakenException;
 import service.BadRequestException;
 import service.Service;
@@ -21,12 +20,10 @@ public class Server {
     public Server() {
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
-        // These are just hard coded values!!
+        // Endpoints:
         server.delete("db", this::clearApplication);
         server.post("user", this::register);
-
-        // Register your endpoints and exception handlers here.
-
+        server.post("session", this::login);
     }
 
     public int run(int desiredPort) {
@@ -51,6 +48,23 @@ public class Server {
             ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
         } catch (BadRequestException ex) {
             ctx.status(400);
+            ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
+        }
+    }
+
+    private void login(Context ctx) {
+        var serializer = new Gson();
+        String reqJson = ctx.body();
+        LoginRequest req = serializer.fromJson(reqJson, LoginRequest.class);
+
+        try {
+            LoginResult res = service.login(req);
+            ctx.result(serializer.toJson(res));
+        } catch (BadRequestException ex) {
+            ctx.status(400);
+            ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
+        } catch (DataAccessException ex) {
+            ctx.status(401);
             ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
         }
     }

@@ -37,17 +37,31 @@ public class Service {
 
         // Generate new authToken and add to database
         String authToken = generateToken();
-        AuthData newAuth = new AuthData(authToken, newUser.username());
-        authDataAccess.addAuth(newAuth);
+        addToken(newUser.username(), authToken);
 
         // Create register result
         return new RegisterResult(newUser.username(), authToken);
     }
 
-    public LoginResult login(LoginRequest request) {
-        // Find existing user
-//        UserData user = userDataAccess.getUser();
-        return null;
+    public LoginResult login(LoginRequest request) throws DataAccessException, BadRequestException {
+        UserData user = userDataAccess.getUser(request.username());
+        // Throw exception if user has invalid login information
+        if (request.username() == null) {
+            throw new BadRequestException("Error: Please enter a username");
+        } else if (request.password() == null) {
+            throw new BadRequestException("Error: Please enter a password");
+        } else if (user == null) {
+            throw new DataAccessException("Error: User not in database");
+        } else if (!Objects.equals(request.password(), user.password())) {
+            throw new DataAccessException("Error: Incorrect password");
+        }
+
+        // Generate new authToken and add to database
+        String authToken = generateToken();
+        addToken(user.username(), authToken);
+
+        // Create login result
+        return new LoginResult(user.username(), authToken);
     }
 
     public ClearApplicationResult clearApplication(ClearApplicationRequest clearApplicationRequest) {
@@ -60,5 +74,10 @@ public class Service {
 
     public static String generateToken() {
         return UUID.randomUUID().toString();
+    }
+
+    private void addToken(String username, String authToken) {
+        AuthData newAuth = new AuthData(authToken, username);
+        authDataAccess.addAuth(newAuth);
     }
 }
