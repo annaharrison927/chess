@@ -1,17 +1,9 @@
 package service;
 
-import dataaccess.AuthDataAccess;
-import dataaccess.UserDataAccess;
-import dataaccess.GameDataAccess;
-import dataaccess.MemoryAuthDataAccess;
-import dataaccess.MemoryUserDataAccess;
-import dataaccess.MemoryGameDataAccess;
-import request.ClearApplicationRequest;
-import result.ClearApplicationResult;
-import result.RegisterResult;
-import request.RegisterRequest;
-import model.UserData;
-import model.AuthData;
+import dataaccess.*;
+import request.*;
+import result.*;
+import model.*;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -28,11 +20,11 @@ public class Service {
         gameDataAccess = new MemoryGameDataAccess();
     }
 
-    public RegisterResult register(RegisterRequest registerRequest) throws AlreadyTakenException, BadRequestException {
+    public RegisterResult register(RegisterRequest request) throws AlreadyTakenException, BadRequestException {
         // Create new user data
-        UserData newUser = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
+        UserData newUser = new UserData(request.username(), request.password(), request.email());
         // Check if user is already in the database. If not, add the new user to database
-        if (userDataAccess.getUser(newUser) != null) {
+        if (userDataAccess.getUser(newUser.username()) != null) {
             throw new AlreadyTakenException("Error: User already in database");
         } else if (Objects.equals(newUser.username(), "")) {
             throw new BadRequestException("Error: Username is blank");
@@ -50,6 +42,12 @@ public class Service {
 
         // Create register result
         return new RegisterResult(newUser.username(), authToken);
+    }
+
+    public LoginResult login(LoginRequest request) {
+        // Find existing user
+//        UserData user = userDataAccess.getUser();
+        return null;
     }
 
     public ClearApplicationResult clearApplication(ClearApplicationRequest clearApplicationRequest) {

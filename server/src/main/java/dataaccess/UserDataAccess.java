@@ -6,7 +6,7 @@ public interface UserDataAccess {
 
     void addUser(UserData userData);
 
-    UserData getUser(UserData userData);
+    UserData getUser(String username);
 
     void clear();
 
