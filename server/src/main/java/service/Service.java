@@ -1,10 +1,12 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.*;
 import request.*;
 import result.*;
 import model.*;
 
+import java.util.Collections;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -64,14 +66,38 @@ public class Service {
         return new LoginResult(user.username(), authToken);
     }
 
-    public LogoutResult logout(LogoutRequest request) throws DataAccessException {
+    public LogoutResult logout(LogoutRequest request) throws DataAccessException, BadRequestException {
         String authToken = request.authToken();
-        if (authDataAccess.getAuth(authToken) == null) {
-            throw new DataAccessException("Error: Invalid authToken");
-        }
+        checkAuth(authToken);
         authDataAccess.deleteAuth(authToken);
 
         return new LogoutResult();
+    }
+
+    public CreateGameResult createGame(CreateGameRequest request) throws DataAccessException {
+        // Check authToken
+        String authToken = request.authToken();
+        checkAuth(authToken);
+
+        // Check for bad request
+        if (request.gameName() == null) {
+            throw new DataAccessException("Error: Please enter a game name");
+        }
+
+        int gameID = 1;
+        // Create new gameID
+        if (gameDataAccess.getSize() != 0) {
+            int lastID = Collections.max(gameDataAccess.getIDs());
+            gameID = lastID + 1;
+        }
+
+        // Add game data
+        ChessGame newGame = new ChessGame();
+        GameData gameData = new GameData(gameID, null, null, request.gameName(), newGame);
+        gameDataAccess.addGame(gameData);
+
+        // Make create result
+        return new CreateGameResult(gameID);
     }
 
     public ClearApplicationResult clearApplication(ClearApplicationRequest clearApplicationRequest) {
@@ -89,5 +115,11 @@ public class Service {
     private void addToken(String username, String authToken) {
         AuthData newAuth = new AuthData(authToken, username);
         authDataAccess.addAuth(newAuth);
+    }
+
+    private void checkAuth(String authToken) throws DataAccessException {
+        if (authDataAccess.getAuth(authToken) == null) {
+            throw new DataAccessException("Error: Invalid authToken");
+        }
     }
 }
