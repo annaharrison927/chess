@@ -100,6 +100,42 @@ public class Service {
         return new CreateGameResult(gameID);
     }
 
+    public JoinGameResult joinGame(JoinGameRequest request) throws DataAccessException, BadRequestException {
+        // Check authToken
+        String authToken = request.authToken();
+        checkAuth(authToken);
+
+        // Check for bad request and invalid inputs
+        if (request.gameID() == 0) { // CHANGE THIS LATER!!
+            throw new BadRequestException("Error: Please enter a game ID");
+        } else if (gameDataAccess.getGame(request.gameID()) == null) {
+            throw new DataAccessException("Error: Invalid game ID");
+        }
+
+        // Get username
+        AuthData authData = authDataAccess.getAuth(authToken);
+        String username = authData.username();
+
+        // Update username
+        String whiteUsername = null;
+        String blackUsername = null;
+        String color = request.playerColor();
+        if (Objects.equals(color, "BLACK")) {
+            blackUsername = username;
+        } else {
+            whiteUsername = username;
+        }
+
+        // Add updated data to gameDataAccess
+        GameData oldGameData = gameDataAccess.getGame(request.gameID());
+        String gameName = oldGameData.gameName();
+        ChessGame game = oldGameData.game();
+        GameData updatedGameData = new GameData(request.gameID(), whiteUsername, blackUsername, gameName, game);
+        gameDataAccess.addGame(updatedGameData);
+
+        return new JoinGameResult();
+    }
+
     public ClearApplicationResult clearApplication(ClearApplicationRequest clearApplicationRequest) {
         gameDataAccess.clear();
         userDataAccess.clear();

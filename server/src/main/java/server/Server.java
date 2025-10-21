@@ -1,5 +1,6 @@
 package server;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -29,6 +30,7 @@ public class Server {
         server.post("session", this::login);
         server.delete("session", this::logout);
         server.post("game", this::createGame);
+        server.put("game", this::joinGame);
     }
 
     public int run(int desiredPort) {
@@ -111,6 +113,36 @@ public class Server {
         // Get result from service
         try {
             CreateGameResult res = service.createGame(req);
+            ctx.result(serializer.toJson(res));
+        } catch (DataAccessException ex) {
+            ctx.status(401);
+            ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
+        } catch (BadRequestException ex) {
+            ctx.status(400);
+            ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
+        }
+    }
+
+    private void joinGame(Context ctx) {
+        var serializer = new Gson();
+        String authToken = ctx.header("authorization");
+        String jsonBody = ctx.body();
+        int gameID = 0;
+        String playerColor = null;
+        if (!jsonBody.equals("{}")) {
+            JsonElement jsonParsed = JsonParser.parseString(jsonBody);
+            JsonObject jsonObject = jsonParsed.getAsJsonObject();
+            gameID = jsonObject.get("gameID").getAsInt();
+            playerColor = jsonObject.get("playerColor").getAsString();
+        }
+
+        // Make request
+        String reqJson = String.format("{ \"playerColor\":\"%s\", \"gameID\":\"%d\", \"authToken\":\"%s\" }", playerColor, gameID, authToken);
+        JoinGameRequest req = serializer.fromJson(reqJson, JoinGameRequest.class);
+
+        // Get result from service
+        try {
+            JoinGameResult res = service.joinGame(req);
             ctx.result(serializer.toJson(res));
         } catch (DataAccessException ex) {
             ctx.status(401);
