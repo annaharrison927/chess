@@ -72,9 +72,12 @@ public class Server {
 
     private void logout(Context ctx) {
         var serializer = new Gson();
-        String reqJson = ctx.header("authorization");
+        String authToken = ctx.header("authorization");
+        String reqJson = String.format("{ \"authToken\":\"%s\" }", authToken);
         LogoutRequest req = serializer.fromJson(reqJson, LogoutRequest.class);
-
+        String practice = """
+                        {"username" : "bob"}
+                """;
         try {
             LogoutResult res = service.logout(req);
             ctx.result(serializer.toJson(res));
