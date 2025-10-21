@@ -66,7 +66,7 @@ public class Service {
         return new LoginResult(user.username(), authToken);
     }
 
-    public LogoutResult logout(LogoutRequest request) throws DataAccessException, BadRequestException {
+    public LogoutResult logout(LogoutRequest request) throws DataAccessException {
         String authToken = request.authToken();
         checkAuth(authToken);
         authDataAccess.deleteAuth(authToken);
@@ -74,14 +74,14 @@ public class Service {
         return new LogoutResult();
     }
 
-    public CreateGameResult createGame(CreateGameRequest request) throws DataAccessException {
+    public CreateGameResult createGame(CreateGameRequest request) throws DataAccessException, BadRequestException {
         // Check authToken
         String authToken = request.authToken();
         checkAuth(authToken);
 
         // Check for bad request
-        if (request.gameName() == null) {
-            throw new DataAccessException("Error: Please enter a game name");
+        if (request.gameName() == null || request.gameName().equals("null")) {
+            throw new BadRequestException("Error: Please enter a game name");
         }
 
         int gameID = 1;
