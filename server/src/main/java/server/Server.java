@@ -31,6 +31,7 @@ public class Server {
         server.delete("session", this::logout);
         server.post("game", this::createGame);
         server.put("game", this::joinGame);
+        server.get("game", this::listGames);
     }
 
     public int run(int desiredPort) {
@@ -151,6 +152,21 @@ public class Server {
             ctx.status(400);
             ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
         }
+    }
+
+    private void listGames(Context ctx) throws DataAccessException {
+        var serializer = new Gson();
+        String authToken = ctx.header("authorization");
+        ListGamesRequest req = new ListGamesRequest(authToken);
+
+        try {
+            ListGamesResult res = service.listGames(req);
+            ctx.result(serializer.toJson(res));
+        } catch (DataAccessException ex) {
+            ctx.status(401);
+            ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
+        }
+
     }
 
     private void clearApplication(Context ctx) {

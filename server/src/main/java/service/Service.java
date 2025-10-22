@@ -1,14 +1,14 @@
 package service;
 
 import chess.ChessGame;
+import com.google.gson.Gson;
 import dataaccess.*;
 import request.*;
 import result.*;
 import model.*;
 
-import java.util.Collections;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+import java.util.HashMap;
 
 public class Service {
     private final UserDataAccess userDataAccess;
@@ -134,6 +134,32 @@ public class Service {
         gameDataAccess.addGame(updatedGameData);
 
         return new JoinGameResult();
+    }
+
+    public ListGamesResult listGames(ListGamesRequest request) throws DataAccessException {
+        // Check authToken
+        String authToken = request.authToken();
+        checkAuth(authToken);
+
+        Collection<GameData> games = gameDataAccess.listGames().values();
+
+//        List<String> games = new ArrayList<>();
+
+//        // Get all games from gameDataAccess
+//        Set<Integer> gameIDs = gameDataAccess.getIDs();
+//        for (int gameID : gameIDs) {
+//            GameData gameData = gameDataAccess.getGame(gameID);
+//            String whiteUsername = gameData.whiteUsername();
+//            String blackUsername = gameData.blackUsername();
+//            String gameName = gameData.gameName();
+//
+//            var serializer = new Gson();
+//            String gameJson = String.format("{ \"gameID\":\"%d\", \"whiteUsername\":\"%s\", \"blackUsername\":\"%s\", \"gameName\":\"%s\" }", gameID, whiteUsername, blackUsername, gameName);
+//            String game = serializer.fromJson(gameJson, String.class);
+//            games.add(game);
+//        }
+
+        return new ListGamesResult(games);
     }
 
     public ClearApplicationResult clearApplication(ClearApplicationRequest clearApplicationRequest) {
