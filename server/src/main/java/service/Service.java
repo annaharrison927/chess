@@ -100,34 +100,43 @@ public class Service {
         return new CreateGameResult(gameID);
     }
 
-    public JoinGameResult joinGame(JoinGameRequest request) throws DataAccessException, BadRequestException {
+    public JoinGameResult joinGame(JoinGameRequest request) throws DataAccessException, BadRequestException, AlreadyTakenException {
         // Check authToken
         String authToken = request.authToken();
         checkAuth(authToken);
 
+        String color = request.playerColor();
         // Check for bad request and invalid inputs
         if (request.gameID() == 0) { // CHANGE THIS LATER!!
             throw new BadRequestException("Error: Please enter a game ID");
         } else if (gameDataAccess.getGame(request.gameID()) == null) {
             throw new DataAccessException("Error: Invalid game ID");
+        } else if (!Objects.equals(color, "BLACK") && !Objects.equals(color, "WHITE")) {
+            throw new BadRequestException("Error: Please enter a valid color (BLACK/WHITE)");
         }
 
         // Get username
         AuthData authData = authDataAccess.getAuth(authToken);
         String username = authData.username();
 
+        GameData oldGameData = gameDataAccess.getGame(request.gameID());
         // Update username
-        String whiteUsername = null;
-        String blackUsername = null;
-        String color = request.playerColor();
+        String whiteUsername = oldGameData.whiteUsername();
+        String blackUsername = oldGameData.blackUsername();
+
         if (Objects.equals(color, "BLACK")) {
+            if (blackUsername != null) {
+                throw new AlreadyTakenException("Error: Color already taken");
+            }
             blackUsername = username;
         } else {
+            if (whiteUsername != null) {
+                throw new AlreadyTakenException("Error: Color already taken");
+            }
             whiteUsername = username;
         }
 
         // Add updated data to gameDataAccess
-        GameData oldGameData = gameDataAccess.getGame(request.gameID());
         String gameName = oldGameData.gameName();
         ChessGame game = oldGameData.game();
         GameData updatedGameData = new GameData(request.gameID(), whiteUsername, blackUsername, gameName, game);
@@ -142,22 +151,6 @@ public class Service {
         checkAuth(authToken);
 
         Collection<GameData> games = gameDataAccess.listGames().values();
-
-//        List<String> games = new ArrayList<>();
-
-//        // Get all games from gameDataAccess
-//        Set<Integer> gameIDs = gameDataAccess.getIDs();
-//        for (int gameID : gameIDs) {
-//            GameData gameData = gameDataAccess.getGame(gameID);
-//            String whiteUsername = gameData.whiteUsername();
-//            String blackUsername = gameData.blackUsername();
-//            String gameName = gameData.gameName();
-//
-//            var serializer = new Gson();
-//            String gameJson = String.format("{ \"gameID\":\"%d\", \"whiteUsername\":\"%s\", \"blackUsername\":\"%s\", \"gameName\":\"%s\" }", gameID, whiteUsername, blackUsername, gameName);
-//            String game = serializer.fromJson(gameJson, String.class);
-//            games.add(game);
-//        }
 
         return new ListGamesResult(games);
     }

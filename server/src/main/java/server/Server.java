@@ -129,12 +129,16 @@ public class Server {
         String authToken = ctx.header("authorization");
         String jsonBody = ctx.body();
         int gameID = 0;
-        String playerColor = null;
+        String playerColor = "";
         if (!jsonBody.equals("{}")) {
             JsonElement jsonParsed = JsonParser.parseString(jsonBody);
             JsonObject jsonObject = jsonParsed.getAsJsonObject();
-            gameID = jsonObject.get("gameID").getAsInt();
-            playerColor = jsonObject.get("playerColor").getAsString();
+            if (jsonObject.get("gameID") != null) {
+                gameID = jsonObject.get("gameID").getAsInt();
+            }
+            if (jsonObject.get("playerColor") != null) {
+                playerColor = jsonObject.get("playerColor").getAsString();
+            }
         }
 
         // Make request
@@ -150,6 +154,9 @@ public class Server {
             ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
         } catch (BadRequestException ex) {
             ctx.status(400);
+            ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
+        } catch (AlreadyTakenException ex) {
+            ctx.status(403);
             ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
         }
     }
