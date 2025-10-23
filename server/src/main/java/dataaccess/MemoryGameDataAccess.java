@@ -3,20 +3,22 @@ package dataaccess;
 import model.GameData;
 
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Set;
 
 public class MemoryGameDataAccess implements GameDataAccess {
-    private HashMap<Integer, GameData> game = new HashMap<>();
+    private HashMap<Integer, GameData> games = new HashMap<>();
 
     @Override
     public void addGame(GameData gameData) {
-        game.put(gameData.gameID(), gameData);
+        games.put(gameData.gameID(), gameData);
     }
 
     @Override
     public GameData getGame(int gameID) {
-        return null;
+        return games.get(gameID);
     }
+
 
     @Override
     public void deleteGame(GameData gameData) {
@@ -25,17 +27,22 @@ public class MemoryGameDataAccess implements GameDataAccess {
 
     @Override
     public void clear() {
-        game.clear();
+        games.clear();
     }
 
     @Override
     public int getSize() {
-        return game.size();
+        return games.size();
     }
 
     @Override
     public Set<Integer> getIDs() {
-        return game.keySet();
+        return games.keySet();
+    }
+
+    @Override
+    public HashMap<Integer, GameData> listGames() {
+        return games;
     }
 
 
