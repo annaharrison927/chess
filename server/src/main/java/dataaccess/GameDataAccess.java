@@ -10,8 +10,6 @@ public interface GameDataAccess {
 
     GameData getGame(int gameID);
 
-    void deleteGame(GameData gameData);
-
     void clear();
 
     int getSize();

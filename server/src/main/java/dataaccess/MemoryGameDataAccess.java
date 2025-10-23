@@ -19,12 +19,6 @@ public class MemoryGameDataAccess implements GameDataAccess {
         return games.get(gameID);
     }
 
-
-    @Override
-    public void deleteGame(GameData gameData) {
-
-    }
-
     @Override
     public void clear() {
         games.clear();
