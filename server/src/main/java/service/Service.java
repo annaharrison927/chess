@@ -35,6 +35,7 @@ public class Service {
         } else if (Objects.equals(newUser.email(), null)) {
             throw new BadRequestException("Error: Please enter a valid email address");
         }
+        var hashPW = newUser.password(); // CLASS NOTES PHASE 4
         userDataAccess.addUser(newUser);
 
         // Generate new authToken and add to database
