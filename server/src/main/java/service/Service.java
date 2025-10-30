@@ -3,6 +3,7 @@ package service;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.*;
+import org.mindrot.jbcrypt.BCrypt;
 import request.*;
 import result.*;
 import model.*;
@@ -18,14 +19,19 @@ public class Service {
 
 
     public Service() {
-        userDataAccess = new MemoryUserDataAccess();
-        authDataAccess = new MemoryAuthDataAccess();
+        userDataAccess = new MySQLUserDataAccess();
+        authDataAccess = new MySQLAuthDataAccess();
         gameDataAccess = new MemoryGameDataAccess();
     }
 
     public RegisterResult register(RegisterRequest request) throws AlreadyTakenException, BadRequestException, SQLException, DataAccessException {
+        // Hash password
+        String clearTextPassword = request.password();
+        String hashedPassword = BCrypt.hashpw(clearTextPassword, BCrypt.gensalt());
+
         // Create new user data
-        UserData newUser = new UserData(request.username(), request.password(), request.email());
+        UserData newUser = new UserData(request.username(), hashedPassword, request.email());
+
         // Check if user is already in the database. If not, add the new user to database
         if (userDataAccess.getUser(newUser.username()) != null) {
             throw new AlreadyTakenException("Error: User already in database");
@@ -36,7 +42,6 @@ public class Service {
         } else if (Objects.equals(newUser.email(), null)) {
             throw new BadRequestException("Error: Please enter a valid email address");
         }
-        var hashPW = newUser.password(); // CLASS NOTES PHASE 4
         userDataAccess.addUser(newUser);
 
         // Generate new authToken and add to database
@@ -179,4 +184,5 @@ public class Service {
             throw new DataAccessException("Error: Invalid authToken");
         }
     }
+
 }

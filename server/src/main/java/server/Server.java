@@ -58,7 +58,7 @@ public class Server {
         } catch (BadRequestException ex) {
             ctx.status(400);
             ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
-        } catch (SQLException e) {
+        } catch (SQLException | DataAccessException e) {
             throw new RuntimeException(e);
         }
     }

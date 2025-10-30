@@ -7,6 +7,11 @@ import javax.xml.crypto.Data;
 import java.sql.*;
 
 public class MySQLUserDataAccess implements UserDataAccess {
+
+    public MySQLUserDataAccess() throws Exception {
+        configureDatabase();
+    }
+
     @Override
     public void addUser(UserData userData) throws SQLException, DataAccessException {
         try (Connection connection = DatabaseManager.getConnection()) {

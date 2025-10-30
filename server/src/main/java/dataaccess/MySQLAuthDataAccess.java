@@ -53,7 +53,7 @@ public class MySQLAuthDataAccess implements AuthDataAccess {
             """
     };
 
-    private void configureDatabase() throws Exception {
+    private void configureDatabase() throws SQLException, DataAccessException {
         DatabaseManager.createDatabase();
         try (Connection connection = DatabaseManager.getConnection()) {
             for (String statement : createStatements) {
@@ -62,7 +62,7 @@ public class MySQLAuthDataAccess implements AuthDataAccess {
                 }
             }
         } catch (SQLException ex) {
-            throw new Exception(); // EDIT THIS LATER
+            throw new SQLException(); // EDIT THIS LATER
         }
     }
 }
