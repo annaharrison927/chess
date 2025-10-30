@@ -2,9 +2,11 @@ package dataaccess;
 
 import model.AuthData;
 
+import java.sql.SQLException;
+
 public interface AuthDataAccess {
 
-    void addAuth(AuthData authData);
+    void addAuth(AuthData authData) throws DataAccessException, SQLException;
 
     AuthData getAuth(String authToken);
 

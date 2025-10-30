@@ -58,9 +58,9 @@ public class MySQLUserDataAccess implements UserDataAccess {
     private final String[] createStatements = {
             """
             CREATE TABLE IF NOT EXISTS userData(
-            `username` String NOT NULL,
-            `password` String NOT NULL,
-            `email` String NOT NULL
+            `username` varchar(256) NOT NULL,
+            `password` varchar(256) NOT NULL,
+            `email` varchar(256) NOT NULL
             PRIMARY KEY (`username`)
             )
             """
