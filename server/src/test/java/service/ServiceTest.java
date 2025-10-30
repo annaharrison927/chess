@@ -3,6 +3,8 @@ package service;
 import dataaccess.DataAccessException;
 import org.eclipse.jetty.util.log.Log;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import request.*;
 import result.CreateGameResult;
@@ -14,9 +16,19 @@ public class ServiceTest {
     private static Service service;
     private String existingAuth;
 
+    @BeforeAll
+    public static void init() {
+        service = new Service();
+    }
+
+    @BeforeEach
+    public void setup() {
+        service.clearApplication();
+    }
+
     @Test
     void registerGood() {
-        Service service = new Service();
+
         RegisterRequest registerRequest = new RegisterRequest("Banana Man", "iLiKeC00kies123", "monkeyzarecool@gmail.com");
         Assertions.assertDoesNotThrow(() -> {
             service.register(registerRequest);
@@ -25,14 +37,14 @@ public class ServiceTest {
 
     @Test
     void registerBad() {
-        Service service = new Service();
+
         RegisterRequest registerRequest = new RegisterRequest("Batman", "supermanStinks", null);
         Assertions.assertThrows(BadRequestException.class, () -> service.register(registerRequest));
     }
 
     @Test
-    void loginGood() {
-        Service service = new Service();
+    void loginGood() throws DataAccessException {
+
         RegisterRequest registerRequest = new RegisterRequest("Grandma", "whatsmypasswordagain??", "gertrudejones1947@hotmail.com");
         service.register(registerRequest);
 
@@ -43,8 +55,8 @@ public class ServiceTest {
     }
 
     @Test
-    void loginBad() {
-        Service service = new Service();
+    void loginBad() throws DataAccessException {
+
         RegisterRequest registerRequest = new RegisterRequest("Grandma", "whatsmypasswordagain??", "gertrudejones1947@hotmail.com");
         service.register(registerRequest);
 
@@ -54,7 +66,7 @@ public class ServiceTest {
 
     @Test
     void logoutGood() throws DataAccessException {
-        Service service = new Service();
+
         RegisterRequest registerRequest = new RegisterRequest("Grandma", "whatsmypasswordagain??", "gertrudejones1947@hotmail.com");
         service.register(registerRequest);
 
@@ -70,7 +82,7 @@ public class ServiceTest {
 
     @Test
     void logoutBad() {
-        Service service = new Service();
+
         String authToken = null;
 
         LogoutRequest logoutRequest = new LogoutRequest(authToken);
@@ -79,7 +91,7 @@ public class ServiceTest {
 
     @Test
     void createGameGood() throws DataAccessException {
-        Service service = new Service();
+
         RegisterRequest registerRequest = new RegisterRequest("Grandma", "whatsmypasswordagain??", "gertrudejones1947@hotmail.com");
         service.register(registerRequest);
 
@@ -95,7 +107,7 @@ public class ServiceTest {
 
     @Test
     void createGameBad() throws DataAccessException {
-        Service service = new Service();
+
         RegisterRequest registerRequest = new RegisterRequest("Grandma", "whatsmypasswordagain??", "gertrudejones1947@hotmail.com");
         service.register(registerRequest);
 
@@ -109,7 +121,7 @@ public class ServiceTest {
 
     @Test
     void joinGameGood() throws DataAccessException {
-        Service service = new Service();
+
         RegisterRequest registerRequest = new RegisterRequest("Grandma", "whatsmypasswordagain??", "gertrudejones1947@hotmail.com");
         service.register(registerRequest);
 
@@ -129,7 +141,7 @@ public class ServiceTest {
 
     @Test
     void joinGameBad() throws DataAccessException {
-        Service service = new Service();
+
         RegisterRequest registerRequest = new RegisterRequest("Grandma", "whatsmypasswordagain??", "gertrudejones1947@hotmail.com");
         service.register(registerRequest);
 
@@ -147,7 +159,7 @@ public class ServiceTest {
 
     @Test
     void listGamesGood() throws DataAccessException {
-        Service service = new Service();
+
         RegisterRequest registerRequest = new RegisterRequest("Grandma", "whatsmypasswordagain??", "gertrudejones1947@hotmail.com");
         service.register(registerRequest);
 
@@ -166,14 +178,14 @@ public class ServiceTest {
 
     @Test
     void listGamesBad() {
-        Service service = new Service();
+
         ListGamesRequest listGamesRequest = new ListGamesRequest(null);
         Assertions.assertThrows(DataAccessException.class, () -> service.listGames(listGamesRequest));
     }
 
     @Test
     void clearApplication() throws DataAccessException {
-        Service service = new Service();
+
         RegisterRequest registerRequest = new RegisterRequest("Grandma", "whatsmypasswordagain??", "gertrudejones1947@hotmail.com");
         service.register(registerRequest);
 

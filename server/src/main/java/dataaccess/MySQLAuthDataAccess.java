@@ -7,14 +7,16 @@ import java.sql.SQLException;
 
 public class MySQLAuthDataAccess implements AuthDataAccess {
 
-    public MySQLAuthDataAccess() throws Exception {
+    public MySQLAuthDataAccess() throws DataAccessException {
         configureDatabase();
     }
 
     @Override
-    public void addAuth(AuthData authData) throws DataAccessException, SQLException {
+    public void addAuth(AuthData authData) throws DataAccessException {
         try (Connection connection = DatabaseManager.getConnection()) {
             insertAuth(connection, authData.authToken(), authData.username());
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage(), ex); // EDIT THIS LATER
         }
     }
 
@@ -53,7 +55,7 @@ public class MySQLAuthDataAccess implements AuthDataAccess {
             """
     };
 
-    private void configureDatabase() throws SQLException, DataAccessException {
+    private void configureDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
         try (Connection connection = DatabaseManager.getConnection()) {
             for (String statement : createStatements) {
@@ -62,7 +64,7 @@ public class MySQLAuthDataAccess implements AuthDataAccess {
                 }
             }
         } catch (SQLException ex) {
-            throw new SQLException(); // EDIT THIS LATER
+            throw new DataAccessException(ex.getMessage(), ex); // EDIT THIS LATER
         }
     }
 }

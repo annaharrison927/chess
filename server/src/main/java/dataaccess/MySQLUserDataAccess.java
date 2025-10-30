@@ -8,21 +8,25 @@ import java.sql.*;
 
 public class MySQLUserDataAccess implements UserDataAccess {
 
-    public MySQLUserDataAccess() throws Exception {
+    public MySQLUserDataAccess() throws DataAccessException {
         configureDatabase();
     }
 
     @Override
-    public void addUser(UserData userData) throws SQLException, DataAccessException {
+    public void addUser(UserData userData) throws DataAccessException {
         try (Connection connection = DatabaseManager.getConnection()) {
             insertUser(connection, userData.username(), userData.password(), userData.email());
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage(), ex); // EDIT THIS LATER
         }
     }
 
     @Override
-    public UserData getUser(String username) throws SQLException, DataAccessException {
+    public UserData getUser(String username) throws DataAccessException {
         try (Connection connection = DatabaseManager.getConnection()) {
             return retrieveUser(connection, username);
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage(), ex); // EDIT THIS LATER
         }
     }
 
@@ -31,7 +35,7 @@ public class MySQLUserDataAccess implements UserDataAccess {
 
     }
 
-    private void insertUser(Connection conn, String username, String password, String email) throws SQLException {
+    private void insertUser(Connection conn, String username, String password, String email) throws DataAccessException {
         try (var preparedStatement = conn.prepareStatement(
                 "INSERT INTO userData (username, password, email) VALUES (?, ?, ?)")) {
             preparedStatement.setString(1, username);
@@ -39,10 +43,12 @@ public class MySQLUserDataAccess implements UserDataAccess {
             preparedStatement.setString(3, email);
 
             preparedStatement.executeUpdate();
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage(), ex); // EDIT THIS LATER
         }
     }
 
-    private UserData retrieveUser(Connection conn, String username) throws SQLException {
+    private UserData retrieveUser(Connection conn, String username) throws DataAccessException {
         UserData userData = new UserData(username, null, null);
         try (var preparedStatement = conn.prepareStatement(
                 "SELECT username, json FROM userData WHERE username=?")) {
@@ -56,6 +62,8 @@ public class MySQLUserDataAccess implements UserDataAccess {
                     userData = new UserData(username, password, email);
                 }
             }
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage(), ex); // EDIT THIS LATER
         }
         return userData;
     }
@@ -71,7 +79,7 @@ public class MySQLUserDataAccess implements UserDataAccess {
             """
     };
 
-    private void configureDatabase() throws Exception {
+    private void configureDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
         try (Connection connection = DatabaseManager.getConnection()) {
             for (String statement : createStatements) {
@@ -80,7 +88,7 @@ public class MySQLUserDataAccess implements UserDataAccess {
                 }
             }
         } catch (SQLException ex) {
-            throw new Exception(); // EDIT THIS LATER
+            throw new DataAccessException(ex.getMessage(), ex);
         }
     }
 }

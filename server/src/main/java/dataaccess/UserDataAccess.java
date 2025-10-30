@@ -6,9 +6,9 @@ import java.sql.SQLException;
 
 public interface UserDataAccess {
 
-    void addUser(UserData userData) throws SQLException, DataAccessException;
+    void addUser(UserData userData) throws DataAccessException;
 
-    UserData getUser(String username) throws SQLException, DataAccessException;
+    UserData getUser(String username) throws DataAccessException;
 
     void clear();
 

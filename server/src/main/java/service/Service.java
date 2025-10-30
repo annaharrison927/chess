@@ -19,12 +19,16 @@ public class Service {
 
 
     public Service() {
-        userDataAccess = new MySQLUserDataAccess();
-        authDataAccess = new MySQLAuthDataAccess();
-        gameDataAccess = new MemoryGameDataAccess();
+        try {
+            userDataAccess = new MySQLUserDataAccess();
+            authDataAccess = new MySQLAuthDataAccess();
+            gameDataAccess = new MemoryGameDataAccess();
+        } catch (DataAccessException ex) {
+            throw new RuntimeException(ex.getMessage(), ex); // EDIT THIS LATER
+        }
     }
 
-    public RegisterResult register(RegisterRequest request) throws AlreadyTakenException, BadRequestException, SQLException, DataAccessException {
+    public RegisterResult register(RegisterRequest request) throws AlreadyTakenException, BadRequestException, DataAccessException {
         // Hash password
         String clearTextPassword = request.password();
         String hashedPassword = BCrypt.hashpw(clearTextPassword, BCrypt.gensalt());
@@ -174,7 +178,7 @@ public class Service {
         return UUID.randomUUID().toString();
     }
 
-    private void addToken(String username, String authToken) {
+    private void addToken(String username, String authToken) throws DataAccessException {
         AuthData newAuth = new AuthData(authToken, username);
         authDataAccess.addAuth(newAuth);
     }

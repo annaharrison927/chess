@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public interface AuthDataAccess {
 
-    void addAuth(AuthData authData) throws DataAccessException, SQLException;
+    void addAuth(AuthData authData) throws DataAccessException;
 
     AuthData getAuth(String authToken);
 

@@ -14,7 +14,6 @@ import service.AlreadyTakenException;
 import service.BadRequestException;
 import service.Service;
 
-import java.sql.SQLException;
 import java.util.Map;
 
 public class Server {
@@ -58,8 +57,8 @@ public class Server {
         } catch (BadRequestException ex) {
             ctx.status(400);
             ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
-        } catch (SQLException | DataAccessException e) {
-            throw new RuntimeException(e);
+        } catch (DataAccessException ex) {
+            throw new RuntimeException(ex);
         }
     }
 

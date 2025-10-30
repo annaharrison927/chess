@@ -9,7 +9,7 @@ public class MemoryUserDataAccess implements UserDataAccess {
     private HashMap<String, UserData> users = new HashMap<>();
 
     @Override
-    public void addUser(UserData userData) throws SQLException {
+    public void addUser(UserData userData) {
         users.put(userData.username(), userData);
     }
 
