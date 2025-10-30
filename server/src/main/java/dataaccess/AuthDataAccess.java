@@ -12,5 +12,5 @@ public interface AuthDataAccess {
 
     void deleteAuth(String authToken);
 
-    void clear();
+    void clear() throws DataAccessException;
 }

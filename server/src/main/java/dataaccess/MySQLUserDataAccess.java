@@ -17,7 +17,7 @@ public class MySQLUserDataAccess implements UserDataAccess {
         try (Connection connection = DatabaseManager.getConnection()) {
             insertUser(connection, userData.username(), userData.password(), userData.email());
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex); // EDIT THIS LATER
+            throw new DataAccessException(ex.getMessage(), ex);
         }
     }
 
@@ -26,13 +26,17 @@ public class MySQLUserDataAccess implements UserDataAccess {
         try (Connection connection = DatabaseManager.getConnection()) {
             return retrieveUser(connection, username);
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex); // EDIT THIS LATER
+            throw new DataAccessException(ex.getMessage(), ex);
         }
     }
 
     @Override
-    public void clear() {
-
+    public void clear() throws DataAccessException {
+        try (Connection connection = DatabaseManager.getConnection()) {
+            deleteAllUsers(connection);
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage(), ex);
+        }
     }
 
     private void insertUser(Connection conn, String username, String password, String email) throws DataAccessException {
@@ -63,9 +67,18 @@ public class MySQLUserDataAccess implements UserDataAccess {
                 }
             }
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex); // EDIT THIS LATER
+            throw new DataAccessException(ex.getMessage(), ex);
         }
         return userData;
+    }
+
+    private void deleteAllUsers(Connection conn) throws DataAccessException {
+        try (var preparedStatement = conn.prepareStatement(
+                "TRUNCATE TABLE userData")) {
+            preparedStatement.executeUpdate();
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage(), ex);
+        }
     }
 
     private final String[] createStatements = {

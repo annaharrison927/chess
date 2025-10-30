@@ -178,7 +178,7 @@ public class Server {
 
     }
 
-    private void clearApplication(Context ctx) {
+    private void clearApplication(Context ctx) throws DataAccessException {
         var serializer = new Gson();
         String reqJson = ctx.body();
         ClearApplicationRequest req = serializer.fromJson(reqJson, ClearApplicationRequest.class);

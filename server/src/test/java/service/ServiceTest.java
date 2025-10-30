@@ -22,8 +22,9 @@ public class ServiceTest {
     }
 
     @BeforeEach
-    public void setup() {
-        service.clearApplication();
+    public void setup() throws DataAccessException {
+        ClearApplicationRequest clearApplicationRequest = new ClearApplicationRequest();
+        service.clearApplication(clearApplicationRequest);
     }
 
     @Test

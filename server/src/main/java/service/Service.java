@@ -166,7 +166,7 @@ public class Service {
         return new ListGamesResult(games);
     }
 
-    public ClearApplicationResult clearApplication(ClearApplicationRequest clearApplicationRequest) {
+    public ClearApplicationResult clearApplication(ClearApplicationRequest clearApplicationRequest) throws DataAccessException {
         gameDataAccess.clear();
         userDataAccess.clear();
         authDataAccess.clear();
