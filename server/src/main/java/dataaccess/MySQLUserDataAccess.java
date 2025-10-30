@@ -4,10 +4,7 @@ import com.google.gson.Gson;
 import model.UserData;
 
 import javax.xml.crypto.Data;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class MySQLUserDataAccess implements UserDataAccess {
     @Override
@@ -20,8 +17,7 @@ public class MySQLUserDataAccess implements UserDataAccess {
     @Override
     public UserData getUser(String username) throws SQLException, DataAccessException {
         try (Connection connection = DatabaseManager.getConnection()) {
-            var statement = "SELECT username, json FROM userData WHERE id=?";
-
+            return retrieveUser(connection, username);
         }
     }
 
@@ -32,13 +28,31 @@ public class MySQLUserDataAccess implements UserDataAccess {
 
     private void insertUser(Connection conn, String username, String password, String email) throws SQLException {
         try (var preparedStatement = conn.prepareStatement(
-                "INSERT INTO userData (username, password, email) VALUES (?, ?)")) {
+                "INSERT INTO userData (username, password, email) VALUES (?, ?, ?)")) {
             preparedStatement.setString(1, username);
             preparedStatement.setString(2, password);
             preparedStatement.setString(3, email);
 
             preparedStatement.executeUpdate();
         }
+    }
+
+    private UserData retrieveUser(Connection conn, String username) throws SQLException {
+        UserData userData = new UserData(username, null, null);
+        try (var preparedStatement = conn.prepareStatement(
+                "SELECT username, json FROM userData WHERE username=?")) {
+            preparedStatement.setString(1, username);
+
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                if (rs.next()) {
+                    String password = rs.getString("password");
+                    String email = rs.getString(("email"));
+
+                    userData = new UserData(username, password, email);
+                }
+            }
+        }
+        return userData;
     }
 
     private final String[] createStatements = {
