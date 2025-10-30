@@ -20,6 +20,7 @@ public class Service {
 
     public Service() {
         try {
+            DatabaseManager.createDatabase();
             userDataAccess = new MySQLUserDataAccess();
             authDataAccess = new MySQLAuthDataAccess();
             gameDataAccess = new MemoryGameDataAccess();

@@ -9,7 +9,6 @@ import java.sql.*;
 public class MySQLUserDataAccess implements UserDataAccess {
 
     public MySQLUserDataAccess() throws DataAccessException {
-        configureDatabase();
     }
 
     @Override
@@ -81,27 +80,5 @@ public class MySQLUserDataAccess implements UserDataAccess {
         }
     }
 
-    private final String[] createStatements = {
-            """
-            CREATE TABLE IF NOT EXISTS userData(
-            `username` varchar(256) NOT NULL,
-            `password` varchar(256) NOT NULL,
-            `email` varchar(256) NOT NULL
-            PRIMARY KEY (`username`)
-            )
-            """
-    };
 
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (Connection connection = DatabaseManager.getConnection()) {
-            for (String statement : createStatements) {
-                try (var preparedStatement = connection.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex);
-        }
-    }
 }

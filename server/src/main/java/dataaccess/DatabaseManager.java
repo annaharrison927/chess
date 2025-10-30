@@ -24,8 +24,39 @@ public class DatabaseManager {
         try (var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
              var preparedStatement = conn.prepareStatement(statement)) {
             preparedStatement.executeUpdate();
+            configureDatabase();
         } catch (SQLException ex) {
             throw new DataAccessException("failed to create database", ex);
+        }
+    }
+
+    private static final String[] createStatements = {
+            """
+            CREATE TABLE IF NOT EXISTS userData(
+            `username` varchar(256) NOT NULL,
+            `password` varchar(256) NOT NULL,
+            `email` varchar(256) NOT NULL,
+            PRIMARY KEY (`username`)
+            )
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS authData(
+            `authToken` varchar(256) NOT NULL,
+            `username` varchar(256) NOT NULL,
+            PRIMARY KEY (`authToken`)
+            )
+            """
+    };
+
+    private static void configureDatabase() throws DataAccessException {
+        try (Connection connection = DatabaseManager.getConnection()) {
+            for (String statement : createStatements) {
+                try (var preparedStatement = connection.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage(), ex);
         }
     }
 

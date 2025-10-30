@@ -8,7 +8,6 @@ import java.sql.SQLException;
 public class MySQLAuthDataAccess implements AuthDataAccess {
 
     public MySQLAuthDataAccess() throws DataAccessException {
-        configureDatabase();
     }
 
     @Override
@@ -58,26 +57,4 @@ public class MySQLAuthDataAccess implements AuthDataAccess {
         }
     }
 
-    private final String[] createStatements = {
-            """
-            CREATE TABLE IF NOT EXISTS authData(
-            `authToken` varchar(256) NOT NULL,
-            `username` varchar(256) NOT NULL,
-            PRIMARY KEY (`authToken`)
-            )
-            """
-    };
-
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (Connection connection = DatabaseManager.getConnection()) {
-            for (String statement : createStatements) {
-                try (var preparedStatement = connection.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex); // EDIT THIS LATER
-        }
-    }
 }
