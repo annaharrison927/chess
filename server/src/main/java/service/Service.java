@@ -7,6 +7,7 @@ import request.*;
 import result.*;
 import model.*;
 
+import java.sql.SQLException;
 import java.util.*;
 import java.util.HashMap;
 
@@ -22,7 +23,7 @@ public class Service {
         gameDataAccess = new MemoryGameDataAccess();
     }
 
-    public RegisterResult register(RegisterRequest request) throws AlreadyTakenException, BadRequestException {
+    public RegisterResult register(RegisterRequest request) throws AlreadyTakenException, BadRequestException, SQLException {
         // Create new user data
         UserData newUser = new UserData(request.username(), request.password(), request.email());
         // Check if user is already in the database. If not, add the new user to database
