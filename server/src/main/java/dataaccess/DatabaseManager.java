@@ -45,6 +45,16 @@ public class DatabaseManager {
             username varchar(256) NOT NULL,
             PRIMARY KEY (`authToken`)
             )
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS gameData(
+            gameID int NOT NULL,
+            whiteUsername varchar(256),
+            blackUsername varchar(256),
+            gameName varchar(256),
+            game text,
+            PRIMARY KEY (`gameID`)
+            )
             """
     };
 

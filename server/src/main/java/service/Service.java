@@ -1,16 +1,13 @@
 package service;
 
 import chess.ChessGame;
-import com.google.gson.Gson;
 import dataaccess.*;
 import org.mindrot.jbcrypt.BCrypt;
 import request.*;
 import result.*;
 import model.*;
 
-import java.sql.SQLException;
 import java.util.*;
-import java.util.HashMap;
 
 public class Service {
     private final UserDataAccess userDataAccess;
@@ -23,7 +20,7 @@ public class Service {
             DatabaseManager.createDatabase();
             userDataAccess = new MySQLUserDataAccess();
             authDataAccess = new MySQLAuthDataAccess();
-            gameDataAccess = new MemoryGameDataAccess();
+            gameDataAccess = new MySQLGameDataAccess();
         } catch (DataAccessException ex) {
             throw new RuntimeException(ex.getMessage(), ex); // EDIT THIS LATER
         }
