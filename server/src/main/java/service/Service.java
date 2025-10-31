@@ -59,6 +59,7 @@ public class Service {
 
     public LoginResult login(LoginRequest request) throws DataAccessException, BadRequestException {
         UserData user = userDataAccess.getUser(request.username());
+
         // Throw exception if user has invalid login information
         if (request.username() == null) {
             throw new BadRequestException("Error: Please enter a username");
@@ -66,7 +67,7 @@ public class Service {
             throw new BadRequestException("Error: Please enter a password");
         } else if (user == null) {
             throw new DataAccessException("Error: User not in database");
-        } else if (!Objects.equals(request.password(), user.password())) {
+        } else if (!BCrypt.checkpw(request.password(), user.password())) {
             throw new DataAccessException("Error: Incorrect password");
         }
 
@@ -189,5 +190,6 @@ public class Service {
             throw new DataAccessException("Error: Invalid authToken");
         }
     }
+
 
 }
