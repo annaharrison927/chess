@@ -1,8 +1,10 @@
 package dataaccess;
 
 import model.AuthData;
+import model.UserData;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class MySQLAuthDataAccess implements AuthDataAccess {
@@ -20,8 +22,17 @@ public class MySQLAuthDataAccess implements AuthDataAccess {
     }
 
     @Override
-    public AuthData getAuth(String authToken) {
-        return null;
+    public AuthData getAuth(String authToken) throws DataAccessException {
+        try (Connection connection = DatabaseManager.getConnection()) {
+            AuthData authData = retrieveAuth(connection, authToken);
+            if (authData.authToken() == null) {
+                return null;
+            } else {
+                return authData;
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage(), ex);
+        }
     }
 
     @Override
@@ -45,6 +56,25 @@ public class MySQLAuthDataAccess implements AuthDataAccess {
             preparedStatement.setString(2, username);
 
             preparedStatement.executeUpdate();
+        }
+    }
+
+    private AuthData retrieveAuth(Connection conn, String authToken) throws DataAccessException {
+        AuthData authData = new AuthData(null, null);
+        try (var preparedStatement = conn.prepareStatement(
+                "SELECT authToken, username FROM authData WHERE authToken=?")) {
+            preparedStatement.setString(1, authToken);
+
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                if (rs.next()) {
+                    String username = rs.getString("username");
+
+                    authData = new AuthData(authToken, username);
+                }
+            }
+            return authData;
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage(), ex);
         }
     }
 
