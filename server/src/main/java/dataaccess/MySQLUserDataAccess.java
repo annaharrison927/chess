@@ -59,7 +59,7 @@ public class MySQLUserDataAccess implements UserDataAccess {
     private UserData retrieveUser(Connection conn, String username) throws DataAccessException {
         UserData userData = new UserData(null, null, null);
         try (var preparedStatement = conn.prepareStatement(
-                "SELECT username FROM userData WHERE username=?")) {
+                "SELECT username, password, email FROM userData WHERE username=?")) {
             preparedStatement.setString(1, username);
 
             try (ResultSet rs = preparedStatement.executeQuery()) {

@@ -33,16 +33,16 @@ public class DatabaseManager {
     private static final String[] createStatements = {
             """
             CREATE TABLE IF NOT EXISTS userData(
-            `username` varchar(256) NOT NULL,
-            `password` varchar(256) NOT NULL,
-            `email` varchar(256) NOT NULL,
+            username varchar(256) NOT NULL,
+            password varchar(256) NOT NULL,
+            email varchar(256) NOT NULL,
             PRIMARY KEY (`username`)
             )
             """,
             """
             CREATE TABLE IF NOT EXISTS authData(
-            `authToken` varchar(256) NOT NULL,
-            `username` varchar(256) NOT NULL,
+            authToken varchar(256) NOT NULL,
+            username varchar(256) NOT NULL,
             PRIMARY KEY (`authToken`)
             )
             """
