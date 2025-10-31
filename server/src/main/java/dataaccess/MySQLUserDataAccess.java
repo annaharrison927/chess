@@ -23,7 +23,12 @@ public class MySQLUserDataAccess implements UserDataAccess {
     @Override
     public UserData getUser(String username) throws DataAccessException {
         try (Connection connection = DatabaseManager.getConnection()) {
-            return retrieveUser(connection, username);
+            UserData userData = retrieveUser(connection, username);
+            if (userData.username() == null) {
+                return null;
+            } else {
+                return userData;
+            }
         } catch (SQLException ex) {
             throw new DataAccessException(ex.getMessage(), ex);
         }
@@ -52,23 +57,23 @@ public class MySQLUserDataAccess implements UserDataAccess {
     }
 
     private UserData retrieveUser(Connection conn, String username) throws DataAccessException {
-        UserData userData = new UserData(username, null, null);
+        UserData userData = new UserData(null, null, null);
         try (var preparedStatement = conn.prepareStatement(
-                "SELECT username, json FROM userData WHERE username=?")) {
+                "SELECT username FROM userData WHERE username=?")) {
             preparedStatement.setString(1, username);
 
             try (ResultSet rs = preparedStatement.executeQuery()) {
                 if (rs.next()) {
                     String password = rs.getString("password");
-                    String email = rs.getString(("email"));
+                    String email = rs.getString("email");
 
                     userData = new UserData(username, password, email);
                 }
             }
+            return userData;
         } catch (SQLException ex) {
             throw new DataAccessException(ex.getMessage(), ex);
         }
-        return userData;
     }
 
     private void deleteAllUsers(Connection conn) throws DataAccessException {
