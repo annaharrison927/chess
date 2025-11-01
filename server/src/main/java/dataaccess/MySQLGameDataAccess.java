@@ -53,13 +53,18 @@ public class MySQLGameDataAccess implements GameDataAccess {
     }
 
     @Override
-    public HashMap<Integer, GameData> listGames() {
-        return null;
+    public HashMap<Integer, GameData> listGames() throws DataAccessException {
+        try (Connection connection = DatabaseManager.getConnection()) {
+            return retrieveGames(connection);
+        } catch (
+                SQLException ex) {
+            throw new DataAccessException(ex.getMessage(), ex);
+        }
     }
 
     private int retrieveSize(Connection conn) throws DataAccessException {
         try (var preparedStatement = conn.prepareStatement(
-                "SELECT gameID AS game_count FROM gameData")) {
+                "SELECT COUNT(*) AS game_count FROM gameData")) {
             try (ResultSet rs = preparedStatement.executeQuery()) {
                 int game_count = 0;
                 if (rs.next()) {
@@ -74,7 +79,7 @@ public class MySQLGameDataAccess implements GameDataAccess {
 
     private Set<Integer> retrieveIDs(Connection conn) throws DataAccessException {
         try (var preparedStatement = conn.prepareStatement(
-                "SELECT COUNT(*) AS gameID FROM gameData")) {
+                "SELECT gameID FROM gameData")) {
             try (ResultSet rs = preparedStatement.executeQuery()) {
                 Set<Integer> gameIDs = new HashSet<>() {
                 };
@@ -83,6 +88,32 @@ public class MySQLGameDataAccess implements GameDataAccess {
                     gameIDs.add(gameID);
                 }
                 return gameIDs;
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage(), ex);
+        }
+    }
+
+    private HashMap<Integer, GameData> retrieveGames(Connection conn) throws DataAccessException {
+        try (var preparedStatement = conn.prepareStatement(
+                "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM gameData")) {
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                HashMap<Integer, GameData> games = new HashMap<>();
+                while (rs.next()) {
+                    int gameID = rs.getInt("gameID");
+                    String whiteUsername = rs.getString("whiteUsername");
+                    String blackUsername = rs.getString("blackUsername");
+                    String gameName = rs.getString("gameName");
+                    String gameJson = rs.getString("game");
+
+                    // Deserialize the game object
+                    ChessGame game = new Gson().fromJson(gameJson, ChessGame.class);
+
+                    GameData gameData = new GameData(gameID, whiteUsername, blackUsername, gameName, game);
+
+                    games.put(gameID, gameData);
+                }
+                return games;
             }
         } catch (SQLException ex) {
             throw new DataAccessException(ex.getMessage(), ex);

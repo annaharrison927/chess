@@ -52,7 +52,7 @@ public class MySQLUserDataAccess implements UserDataAccess {
 
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex); // EDIT THIS LATER
+            throw new DataAccessException(ex.getMessage(), ex);
         }
     }
 

@@ -18,9 +18,9 @@ public class Service {
     public Service() {
         try {
             DatabaseManager.createDatabase();
-            userDataAccess = new MySQLUserDataAccess();
-            authDataAccess = new MySQLAuthDataAccess();
-            gameDataAccess = new MySQLGameDataAccess();
+            userDataAccess = new MemoryUserDataAccess();
+            authDataAccess = new MemoryAuthDataAccess();
+            gameDataAccess = new MemoryGameDataAccess();
         } catch (DataAccessException ex) {
             throw new RuntimeException(ex.getMessage(), ex); // EDIT THIS LATER
         }
@@ -39,7 +39,7 @@ public class Service {
             throw new AlreadyTakenException("Error: User already in database");
         } else if (Objects.equals(newUser.username(), "")) {
             throw new BadRequestException("Error: Username is blank");
-        } else if (Objects.equals(newUser.password(), null)) {
+        } else if (Objects.equals(clearTextPassword, null)) {
             throw new BadRequestException("Error: Please enter a password");
         } else if (Objects.equals(newUser.email(), null)) {
             throw new BadRequestException("Error: Please enter a valid email address");

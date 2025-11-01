@@ -16,5 +16,5 @@ public interface GameDataAccess {
 
     Set<Integer> getIDs() throws DataAccessException;
 
-    HashMap<Integer, GameData> listGames();
+    HashMap<Integer, GameData> listGames() throws DataAccessException;
 }
