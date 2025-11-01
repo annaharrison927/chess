@@ -16,7 +16,7 @@ public class MySQLAuthDataAccess implements AuthDataAccess {
         try (Connection connection = DatabaseManager.getConnection()) {
             insertAuth(connection, authData.authToken(), authData.username());
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex); // EDIT THIS LATER
+            throw new DataAccessException(ex.getMessage(), ex);
         }
     }
 
@@ -35,14 +35,18 @@ public class MySQLAuthDataAccess implements AuthDataAccess {
     }
 
     @Override
-    public void deleteAuth(String authToken) {
-
+    public void deleteAuth(String authToken) throws DataAccessException {
+        try (Connection connection = DatabaseManager.getConnection()) {
+            clearOneAuth(connection, authToken);
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage(), ex);
+        }
     }
 
     @Override
     public void clear() throws DataAccessException {
         try (Connection connection = DatabaseManager.getConnection()) {
-            clearAuth(connection);
+            clearAllAuth(connection);
         } catch (SQLException ex) {
             throw new DataAccessException(ex.getMessage(), ex);
         }
@@ -77,9 +81,19 @@ public class MySQLAuthDataAccess implements AuthDataAccess {
         }
     }
 
-    private void clearAuth(Connection connection) throws DataAccessException {
+    private void clearAllAuth(Connection connection) throws DataAccessException {
         try (var preparedStatement = connection.prepareStatement(
                 "TRUNCATE TABLE authData")) {
+            preparedStatement.executeUpdate();
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage(), ex);
+        }
+    }
+
+    private void clearOneAuth(Connection connection, String authToken) throws DataAccessException {
+        try (var preparedStatement = connection.prepareStatement(
+                "DELETE FROM authData WHERE authToken=?")) {
+            preparedStatement.setString(1, authToken);
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
             throw new DataAccessException(ex.getMessage(), ex);

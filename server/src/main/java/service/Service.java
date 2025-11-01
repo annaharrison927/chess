@@ -18,11 +18,11 @@ public class Service {
     public Service() {
         try {
             DatabaseManager.createDatabase();
-            userDataAccess = new MemoryUserDataAccess();
-            authDataAccess = new MemoryAuthDataAccess();
-            gameDataAccess = new MemoryGameDataAccess();
+            userDataAccess = new MySQLUserDataAccess();
+            authDataAccess = new MySQLAuthDataAccess();
+            gameDataAccess = new MySQLGameDataAccess();
         } catch (DataAccessException ex) {
-            throw new RuntimeException(ex.getMessage(), ex); // EDIT THIS LATER
+            throw new RuntimeException(ex.getMessage(), ex);
         }
     }
 
@@ -117,7 +117,7 @@ public class Service {
 
         String color = request.playerColor();
         // Check for bad request and invalid inputs
-        if (request.gameID() == 0) { // CHANGE THIS LATER!!
+        if (request.gameID() == 0) {
             throw new BadRequestException("Error: Please enter a game ID");
         } else if (gameDataAccess.getGame(request.gameID()) == null) {
             throw new DataAccessException("Error: Invalid game ID");
