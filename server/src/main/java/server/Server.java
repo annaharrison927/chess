@@ -78,11 +78,7 @@ public class Server {
             ctx.status(400);
             ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
         } catch (DataAccessException ex) {
-            if (Objects.equals(ex.getMessage(), "Error: failed to get connection")) {
-                ctx.status(500);
-            } else {
-                ctx.status(401);
-            }
+            chooseStatusCode(ctx, ex);
             ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
         }
     }
@@ -96,11 +92,7 @@ public class Server {
             LogoutResult res = service.logout(req);
             ctx.result(serializer.toJson(res));
         } catch (DataAccessException ex) {
-            if (Objects.equals(ex.getMessage(), "Error: failed to get connection")) {
-                ctx.status(500);
-            } else {
-                ctx.status(401);
-            }
+            chooseStatusCode(ctx, ex);
             ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
         }
 
@@ -127,11 +119,7 @@ public class Server {
             CreateGameResult res = service.createGame(req);
             ctx.result(serializer.toJson(res));
         } catch (DataAccessException ex) {
-            if (Objects.equals(ex.getMessage(), "Error: failed to get connection")) {
-                ctx.status(500);
-            } else {
-                ctx.status(401);
-            }
+            chooseStatusCode(ctx, ex);
             ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
         } catch (BadRequestException ex) {
             ctx.status(400);
@@ -165,11 +153,7 @@ public class Server {
             JoinGameResult res = service.joinGame(req);
             ctx.result(serializer.toJson(res));
         } catch (DataAccessException ex) {
-            if (Objects.equals(ex.getMessage(), "Error: failed to get connection")) {
-                ctx.status(500);
-            } else {
-                ctx.status(401);
-            }
+            chooseStatusCode(ctx, ex);
             ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
         } catch (BadRequestException ex) {
             ctx.status(400);
@@ -188,11 +172,7 @@ public class Server {
             ListGamesResult res = service.listGames(req);
             ctx.result(serializer.toJson(res));
         } catch (DataAccessException ex) {
-            if (Objects.equals(ex.getMessage(), "Error: failed to get connection")) {
-                ctx.status(500);
-            } else {
-                ctx.status(401);
-            }
+            chooseStatusCode(ctx, ex);
             ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
         }
 
@@ -208,6 +188,14 @@ public class Server {
         } catch (DataAccessException ex) {
             ctx.status(500);
             ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
+        }
+    }
+
+    private void chooseStatusCode(Context ctx, DataAccessException ex) {
+        if (Objects.equals(ex.getMessage(), "Error: failed to get connection")) {
+            ctx.status(500);
+        } else {
+            ctx.status(401);
         }
     }
 

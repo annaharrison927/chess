@@ -77,13 +77,13 @@ public class MySQLGameDataAccess implements GameDataAccess {
 
     private int retrieveSize(Connection conn) throws DataAccessException {
         try (var preparedStatement = conn.prepareStatement(
-                "SELECT COUNT(*) AS game_count FROM gameData")) {
+                "SELECT COUNT(*) AS gameCount FROM gameData")) {
             try (ResultSet rs = preparedStatement.executeQuery()) {
-                int game_count = 0;
+                int gameCount = 0;
                 if (rs.next()) {
-                    game_count = rs.getInt("game_count");
+                    gameCount = rs.getInt("gameCount");
                 }
-                return game_count;
+                return gameCount;
             }
         } catch (SQLException ex) {
             throw new DataAccessException("Error: " + ex.getMessage(), ex);
@@ -168,8 +168,8 @@ public class MySQLGameDataAccess implements GameDataAccess {
             preparedStatement.setString(4, gameName);
 
             // Serialize and store the chess game object
-            var game_json = new Gson().toJson(game);
-            preparedStatement.setString(5, game_json);
+            var gameJson = new Gson().toJson(game);
+            preparedStatement.setString(5, gameJson);
 
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
