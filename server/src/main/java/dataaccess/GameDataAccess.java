@@ -8,9 +8,9 @@ import java.util.Set;
 public interface GameDataAccess {
     void addGame(GameData gameData) throws DataAccessException;
 
-    GameData getGame(int gameID);
+    GameData getGame(int gameID) throws DataAccessException;
 
-    void clear();
+    void clear() throws DataAccessException;
 
     int getSize() throws DataAccessException;
 
