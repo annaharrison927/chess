@@ -16,7 +16,7 @@ public class MySQLAuthDataAccess implements AuthDataAccess {
         try (Connection connection = DatabaseManager.getConnection()) {
             insertAuth(connection, authData.authToken(), authData.username());
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex);
+            throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
 
@@ -30,7 +30,7 @@ public class MySQLAuthDataAccess implements AuthDataAccess {
                 return authData;
             }
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex);
+            throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
 
@@ -39,7 +39,7 @@ public class MySQLAuthDataAccess implements AuthDataAccess {
         try (Connection connection = DatabaseManager.getConnection()) {
             clearOneAuth(connection, authToken);
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex);
+            throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
 
@@ -48,17 +48,19 @@ public class MySQLAuthDataAccess implements AuthDataAccess {
         try (Connection connection = DatabaseManager.getConnection()) {
             clearAllAuth(connection);
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex);
+            throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
 
-    private void insertAuth(Connection connection, String authToken, String username) throws SQLException {
+    private void insertAuth(Connection connection, String authToken, String username) throws DataAccessException {
         try (var preparedStatement = connection.prepareStatement(
                 "INSERT INTO authData (authToken, username) VALUES (?, ?)")) {
             preparedStatement.setString(1, authToken);
             preparedStatement.setString(2, username);
 
             preparedStatement.executeUpdate();
+        } catch (SQLException ex) {
+            throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
 
@@ -77,7 +79,7 @@ public class MySQLAuthDataAccess implements AuthDataAccess {
             }
             return authData;
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex);
+            throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
 
@@ -86,7 +88,7 @@ public class MySQLAuthDataAccess implements AuthDataAccess {
                 "TRUNCATE TABLE authData")) {
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex);
+            throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
 
@@ -96,7 +98,7 @@ public class MySQLAuthDataAccess implements AuthDataAccess {
             preparedStatement.setString(1, authToken);
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex);
+            throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
 

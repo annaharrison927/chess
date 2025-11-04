@@ -14,7 +14,9 @@ import service.AlreadyTakenException;
 import service.BadRequestException;
 import service.Service;
 
+import javax.xml.crypto.Data;
 import java.util.Map;
+import java.util.Objects;
 
 public class Server {
 
@@ -58,7 +60,9 @@ public class Server {
             ctx.status(400);
             ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
         } catch (DataAccessException ex) {
-            throw new RuntimeException(ex);
+            ctx.status(500);
+            ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
+            ;
         }
     }
 
@@ -74,7 +78,11 @@ public class Server {
             ctx.status(400);
             ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
         } catch (DataAccessException ex) {
-            ctx.status(401);
+            if (Objects.equals(ex.getMessage(), "Error: failed to get connection")) {
+                ctx.status(500);
+            } else {
+                ctx.status(401);
+            }
             ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
         }
     }
@@ -84,14 +92,15 @@ public class Server {
         String authToken = ctx.header("authorization");
         String reqJson = String.format("{ \"authToken\":\"%s\" }", authToken);
         LogoutRequest req = serializer.fromJson(reqJson, LogoutRequest.class);
-        String practice = """
-                        {"username" : "bob"}
-                """;
         try {
             LogoutResult res = service.logout(req);
             ctx.result(serializer.toJson(res));
         } catch (DataAccessException ex) {
-            ctx.status(401);
+            if (Objects.equals(ex.getMessage(), "Error: failed to get connection")) {
+                ctx.status(500);
+            } else {
+                ctx.status(401);
+            }
             ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
         }
 
@@ -118,7 +127,11 @@ public class Server {
             CreateGameResult res = service.createGame(req);
             ctx.result(serializer.toJson(res));
         } catch (DataAccessException ex) {
-            ctx.status(401);
+            if (Objects.equals(ex.getMessage(), "Error: failed to get connection")) {
+                ctx.status(500);
+            } else {
+                ctx.status(401);
+            }
             ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
         } catch (BadRequestException ex) {
             ctx.status(400);
@@ -152,7 +165,11 @@ public class Server {
             JoinGameResult res = service.joinGame(req);
             ctx.result(serializer.toJson(res));
         } catch (DataAccessException ex) {
-            ctx.status(401);
+            if (Objects.equals(ex.getMessage(), "Error: failed to get connection")) {
+                ctx.status(500);
+            } else {
+                ctx.status(401);
+            }
             ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
         } catch (BadRequestException ex) {
             ctx.status(400);
@@ -167,12 +184,15 @@ public class Server {
         var serializer = new Gson();
         String authToken = ctx.header("authorization");
         ListGamesRequest req = new ListGamesRequest(authToken);
-
         try {
             ListGamesResult res = service.listGames(req);
             ctx.result(serializer.toJson(res));
         } catch (DataAccessException ex) {
-            ctx.status(401);
+            if (Objects.equals(ex.getMessage(), "Error: failed to get connection")) {
+                ctx.status(500);
+            } else {
+                ctx.status(401);
+            }
             ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
         }
 
@@ -182,8 +202,13 @@ public class Server {
         var serializer = new Gson();
         String reqJson = ctx.body();
         ClearApplicationRequest req = serializer.fromJson(reqJson, ClearApplicationRequest.class);
-        ClearApplicationResult res = service.clearApplication(req);
-        ctx.result(serializer.toJson(res));
+        try {
+            ClearApplicationResult res = service.clearApplication(req);
+            ctx.result(serializer.toJson(res));
+        } catch (DataAccessException ex) {
+            ctx.status(500);
+            ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
+        }
     }
 
 

@@ -23,7 +23,7 @@ public class MySQLGameDataAccess implements GameDataAccess {
                 updateGame(connection, gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName());
             }
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex);
+            throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
 
@@ -32,7 +32,7 @@ public class MySQLGameDataAccess implements GameDataAccess {
         try (Connection connection = DatabaseManager.getConnection()) {
             return retrieveGame(connection, gameID);
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex);
+            throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
 
@@ -41,7 +41,7 @@ public class MySQLGameDataAccess implements GameDataAccess {
         try (Connection connection = DatabaseManager.getConnection()) {
             clearAllGames(connection);
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex);
+            throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
 
@@ -51,7 +51,7 @@ public class MySQLGameDataAccess implements GameDataAccess {
             return retrieveSize(connection);
         } catch (
                 SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex);
+            throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
 
@@ -61,7 +61,7 @@ public class MySQLGameDataAccess implements GameDataAccess {
             return retrieveIDs(connection);
         } catch (
                 SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex);
+            throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
 
@@ -71,7 +71,7 @@ public class MySQLGameDataAccess implements GameDataAccess {
             return retrieveGames(connection);
         } catch (
                 SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex);
+            throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
 
@@ -86,7 +86,7 @@ public class MySQLGameDataAccess implements GameDataAccess {
                 return game_count;
             }
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex);
+            throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
 
@@ -103,7 +103,7 @@ public class MySQLGameDataAccess implements GameDataAccess {
                 return gameIDs;
             }
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex);
+            throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
 
@@ -127,7 +127,7 @@ public class MySQLGameDataAccess implements GameDataAccess {
                 return gameData;
             }
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex);
+            throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
 
@@ -153,7 +153,7 @@ public class MySQLGameDataAccess implements GameDataAccess {
                 return games;
             }
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex);
+            throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
 
@@ -173,7 +173,7 @@ public class MySQLGameDataAccess implements GameDataAccess {
 
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex);
+            throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
 
@@ -188,7 +188,7 @@ public class MySQLGameDataAccess implements GameDataAccess {
 
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex);
+            throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
 
@@ -197,7 +197,7 @@ public class MySQLGameDataAccess implements GameDataAccess {
                 "TRUNCATE TABLE gameData")) {
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex);
+            throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
 }

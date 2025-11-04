@@ -16,7 +16,7 @@ public class MySQLUserDataAccess implements UserDataAccess {
         try (Connection connection = DatabaseManager.getConnection()) {
             insertUser(connection, userData.username(), userData.password(), userData.email());
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex);
+            throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
 
@@ -30,7 +30,7 @@ public class MySQLUserDataAccess implements UserDataAccess {
                 return userData;
             }
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex);
+            throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
 
@@ -39,7 +39,7 @@ public class MySQLUserDataAccess implements UserDataAccess {
         try (Connection connection = DatabaseManager.getConnection()) {
             deleteAllUsers(connection);
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex);
+            throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
 
@@ -52,7 +52,7 @@ public class MySQLUserDataAccess implements UserDataAccess {
 
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex);
+            throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
 
@@ -72,7 +72,7 @@ public class MySQLUserDataAccess implements UserDataAccess {
             }
             return userData;
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex);
+            throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
 
@@ -81,9 +81,7 @@ public class MySQLUserDataAccess implements UserDataAccess {
                 "TRUNCATE TABLE userData")) {
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage(), ex);
+            throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
-
-
 }
