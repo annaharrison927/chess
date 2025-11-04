@@ -84,4 +84,5 @@ public class MySQLUserDataAccess implements UserDataAccess {
             throw new DataAccessException("Error: " + ex.getMessage(), ex);
         }
     }
+
 }

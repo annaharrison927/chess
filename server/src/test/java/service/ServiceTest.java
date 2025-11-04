@@ -14,7 +14,6 @@ import service.Service;
 public class ServiceTest {
 
     private static Service service;
-    private String existingAuth;
 
     @BeforeAll
     public static void init() {

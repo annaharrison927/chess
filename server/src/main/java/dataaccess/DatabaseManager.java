@@ -52,7 +52,7 @@ public class DatabaseManager {
             whiteUsername varchar(256),
             blackUsername varchar(256),
             gameName varchar(256),
-            game text,
+            game text NOT NULL,
             PRIMARY KEY (`gameID`)
             )
             """
