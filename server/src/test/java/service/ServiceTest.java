@@ -1,7 +1,6 @@
 package service;
 
 import dataaccess.DataAccessException;
-import org.eclipse.jetty.util.log.Log;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import request.*;
 import result.CreateGameResult;
 import result.LoginResult;
-import service.Service;
 
 public class ServiceTest {
 

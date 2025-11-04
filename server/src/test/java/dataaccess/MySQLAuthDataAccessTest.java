@@ -6,8 +6,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class MySQLAuthDataAccessTest {
 
     private static MySQLAuthDataAccess authDataAccess;
@@ -65,7 +63,7 @@ class MySQLAuthDataAccessTest {
     }
 
     @Test
-    void deleteAuthBad() throws DataAccessException {
+    void deleteAuthBad() {
         AuthData badAuthData = new AuthData(null, "Granny");
 
         Assertions.assertThrows(DataAccessException.class, () -> authDataAccess.addAuth(badAuthData));

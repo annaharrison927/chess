@@ -7,14 +7,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class MySQLGameDataAccessTest {
 
     private static MySQLGameDataAccess gameDataAccess;
 
     @BeforeAll
-    public static void init() throws DataAccessException {
+    public static void init() {
         gameDataAccess = new MySQLGameDataAccess();
     }
 
