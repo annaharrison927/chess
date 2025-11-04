@@ -7,6 +7,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+import java.util.Set;
+
 class MySQLGameDataAccessTest {
 
     private static MySQLGameDataAccess gameDataAccess;
@@ -32,45 +35,99 @@ class MySQLGameDataAccessTest {
     }
 
     @Test
-    void addBad() {
-        GameData badGameData = new GameData(1, "Granny", "Grandpa",
+    void addBad() throws DataAccessException {
+        GameData badGameData = new GameData(-1, "Granny", "Grandpa",
                 "Where's the game??", null);
         Assertions.assertThrows(DataAccessException.class, () -> gameDataAccess.addGame(badGameData));
     }
 
     @Test
-    void getGameGood() {
+    void getGameGood() throws DataAccessException {
+        ChessGame goodGame = new ChessGame();
+        GameData goodGameData = new GameData(1, "Elton John", "Billy Joel",
+                "Long long game", goodGame);
+        gameDataAccess.addGame(goodGameData);
+
+        Assertions.assertDoesNotThrow(() -> {
+            gameDataAccess.getGame(1);
+        });
     }
 
     @Test
-    void getGameBad() {
+    void getGameBad() throws DataAccessException {
+        Assertions.assertNull(gameDataAccess.getGame(1));
     }
 
     @Test
-    void clear() {
+    void clear() throws DataAccessException {
+        ChessGame goodGame = new ChessGame();
+        GameData goodGameData = new GameData(1, "Batman", "Robin",
+                "Superman Stinks", goodGame);
+        gameDataAccess.addGame(goodGameData);
+
+        Assertions.assertDoesNotThrow(() -> {
+            gameDataAccess.clear();
+        });
     }
 
     @Test
-    void getSizeGood() {
+    void getSizeGood() throws DataAccessException {
+        ChessGame superGame = new ChessGame();
+        GameData superGameData = new GameData(1, "Batman", "Robin",
+                "Superman Stinks", superGame);
+        gameDataAccess.addGame(superGameData);
+
+        ChessGame goodGame = new ChessGame();
+        GameData goodGameData = new GameData(2, "Elton John", "Billy Joel",
+                "Long long game", goodGame);
+        gameDataAccess.addGame(goodGameData);
+
+        Assertions.assertEquals(2, gameDataAccess.getSize());
     }
 
     @Test
-    void getSizeBad() {
+    void getSizeBad() throws DataAccessException {
+        Assertions.assertEquals(0, gameDataAccess.getSize());
     }
 
     @Test
-    void getIDsGood() {
+    void getIDsGood() throws DataAccessException {
+        ChessGame game = new ChessGame();
+        GameData gameData = new GameData(3, "Bingo", "Bluey", "Playtime!",
+                game);
+        gameDataAccess.addGame(gameData);
+
+        Assertions.assertDoesNotThrow(() -> {
+            gameDataAccess.getIDs();
+        });
     }
 
     @Test
-    void getIDsBad() {
+    void getIDsBad() throws DataAccessException {
+        Set<Integer> emptyIDSet = gameDataAccess.getIDs();
+        Assertions.assertTrue(emptyIDSet.isEmpty());
     }
 
     @Test
-    void listGamesGood() {
+    void listGamesGood() throws DataAccessException {
+        ChessGame goodGame = new ChessGame();
+        GameData goodGameData = new GameData(2, "Elton John", "Billy Joel",
+                "Long long game", goodGame);
+        gameDataAccess.addGame(goodGameData);
+
+        ChessGame game = new ChessGame();
+        GameData gameData = new GameData(3, "Bingo", "Bluey", "Playtime!",
+                game);
+        gameDataAccess.addGame(gameData);
+
+        Assertions.assertDoesNotThrow(() -> {
+            gameDataAccess.listGames();
+        });
     }
 
     @Test
-    void listGamesBad() {
+    void listGamesBad() throws DataAccessException {
+        HashMap<Integer, GameData> emptyGameList = gameDataAccess.listGames();
+        Assertions.assertTrue(emptyGameList.isEmpty());
     }
 }

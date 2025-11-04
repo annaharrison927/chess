@@ -48,7 +48,7 @@ public class DatabaseManager {
             """,
             """
             CREATE TABLE IF NOT EXISTS gameData(
-            gameID int NOT NULL,
+            gameID int UNSIGNED NOT NULL,
             whiteUsername varchar(256),
             blackUsername varchar(256),
             gameName varchar(256),

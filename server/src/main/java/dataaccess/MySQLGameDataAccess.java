@@ -168,7 +168,11 @@ public class MySQLGameDataAccess implements GameDataAccess {
             preparedStatement.setString(4, gameName);
 
             // Serialize and store the chess game object
-            var gameJson = new Gson().toJson(game);
+            String gameJson = null;
+            if (game != null) {
+                gameJson = new Gson().toJson(game);
+            }
+
             preparedStatement.setString(5, gameJson);
 
             preparedStatement.executeUpdate();
