@@ -2,11 +2,14 @@ package ui;
 
 import javax.swing.plaf.nimbus.State;
 
+import java.util.Arrays;
+import java.util.Scanner;
+
 import static ui.EscapeSequences.*;
 
 public class Client {
     private final ServerFacade serverFacade;
-    private boolean signedIn = false;
+    private boolean loggedIn = false;
 
     public Client(String serverUrl) throws Exception {
         serverFacade = new ServerFacade(serverUrl);
@@ -14,7 +17,48 @@ public class Client {
 
     public void run() {
         System.out.println("Welcome to Chess! Select an option from the menu.");
-        System.out.print("help");
+        System.out.print(help());
+
+        Scanner scanner = new Scanner(System.in);
+        var result = "";
+        while (!result.equals("quit")){
+            // PRINT PROMPT??
+            String line = scanner.nextLine();
+
+        }
+    }
+
+    public String evaluate (String input){
+        try{
+            String[] tokens = input.toLowerCase().split(" ");
+            String command = "help";
+            if (tokens.length > 0){
+                command = tokens[0];
+            }
+            String[] parameters = Arrays.copyOfRange(tokens, 1, tokens.length);
+
+        }
+    }
+
+    public String help() {
+        if (!loggedIn) {
+            return """
+                    * register (username, password, email)
+                    * login (username, password)
+                    * quit
+                    * help
+                    """;
+        } else {
+            return """
+                    * create (name) - create a new game
+                    * list - list all games
+                    * join (id, WHITE/BLACK) - join a game
+                    * observe (id) - observe a game
+                    * logout
+                    * quit
+                    * help
+                    """;
+        }
     }
 
 }
