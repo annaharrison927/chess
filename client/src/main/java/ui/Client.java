@@ -49,6 +49,7 @@ public class Client {
 
             return switch (command) {
                 case "register" -> register(parameters);
+Re                case "quit" -> "quit";
                 default -> help();
             };
         } catch (Exception ex) {
@@ -57,6 +58,9 @@ public class Client {
     }
 
     public String register(String... params) throws Exception {
+        if (params.length != 3) {
+            throw new Exception("Error: Please enter a valid username, password, and email" + "\n");
+        }
         String username = params[0];
         String password = params[1];
         String email = params[2];
@@ -64,7 +68,7 @@ public class Client {
         UserData userData = new UserData(username, password, email);
         serverFacade.register(userData);
 
-        return String.format("Hi %s, you've successfully registered!", username);
+        return String.format("Hi %s, you've successfully registered! \n", username);
     }
 
     public String help() {
