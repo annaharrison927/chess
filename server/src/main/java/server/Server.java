@@ -1,6 +1,5 @@
 package server;
 
-import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -14,7 +13,6 @@ import service.AlreadyTakenException;
 import service.BadRequestException;
 import service.Service;
 
-import javax.xml.crypto.Data;
 import java.util.Map;
 import java.util.Objects;
 

@@ -4,8 +4,8 @@ import chess.ChessGame;
 import dataaccess.*;
 import org.mindrot.jbcrypt.BCrypt;
 import request.*;
-import result.*;
 import model.*;
+import result.*;
 
 import java.util.*;
 
