@@ -51,6 +51,7 @@ public class Client {
             return switch (command) {
                 case "register" -> register(parameters);
                 case "login" -> login(parameters);
+                case "logout" -> logout();
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -94,9 +95,15 @@ public class Client {
         return String.format("%s, you are logged in! \n", username);
     }
 
-//    public String logout() throws Exception {
-//
-//    }
+    public String logout() throws Exception {
+        if (!loggedIn) {
+            throw new Exception("Error: You're not logged in! \n");
+        }
+        serverFacade.logout();
+        loggedIn = false;
+
+        return "You have successfully logged out! \n";
+    }
 
     public String help() {
         if (!loggedIn) {

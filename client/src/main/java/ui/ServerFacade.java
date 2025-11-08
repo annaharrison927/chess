@@ -38,12 +38,13 @@ public class ServerFacade {
         handleResponse(response, LoginResult.class);
     }
 
-    public void logout(LogoutRequest logoutRequest) throws Exception {
+    public void logout() throws Exception {
+        LogoutRequest logoutRequest = new LogoutRequest(authToken);
         var request = buildRequest("DELETE", "/session", logoutRequest, logoutRequest.authToken());
         var response = sendRequest(request);
+        authToken = null;
         handleResponse(response, LogoutResult.class);
     }
-
 
     private HttpRequest buildRequest(String method, String path, Object body, String authToken) {
         var request = HttpRequest.newBuilder()
