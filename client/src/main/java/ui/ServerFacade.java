@@ -5,7 +5,8 @@ import exceptions.AlreadyTakenException;
 import exceptions.BadRequestException;
 import exceptions.DataAccessException;
 import model.UserData;
-import result.RegisterResult;
+import request.*;
+import result.*;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -15,24 +16,44 @@ import java.net.http.HttpResponse;
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
     private final String serverUrl;
+    private String authToken;
 
     public ServerFacade(String url) {
         serverUrl = url;
     }
 
     public void register(UserData userData) throws Exception {
-        var request = buildRequest("POST", "/user", userData);
+        var request = buildRequest("POST", "/user", userData, null);
         var response = sendRequest(request);
+        RegisterResult registerResult = new Gson().fromJson(response.body(), RegisterResult.class);
+        authToken = registerResult.authToken();
         handleResponse(response, RegisterResult.class);
     }
 
+    public void login(LoginRequest loginRequest) throws Exception {
+        var request = buildRequest("POST", "/session", loginRequest, null);
+        var response = sendRequest(request);
+        LoginResult loginResult = new Gson().fromJson(response.body(), LoginResult.class);
+        authToken = loginResult.authToken();
+        handleResponse(response, LoginResult.class);
+    }
 
-    private HttpRequest buildRequest(String method, String path, Object body) {
+    public void logout(LogoutRequest logoutRequest) throws Exception {
+        var request = buildRequest("DELETE", "/session", logoutRequest, logoutRequest.authToken());
+        var response = sendRequest(request);
+        handleResponse(response, LogoutResult.class);
+    }
+
+
+    private HttpRequest buildRequest(String method, String path, Object body, String authToken) {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
                 .method(method, makeRequestBody(body));
         if (body != null) {
             request.setHeader("Content-Type", "application/json");
+        }
+        if (authToken != null) {
+            request.setHeader("authorization", authToken);
         }
         return request.build();
     }

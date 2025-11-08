@@ -1,6 +1,8 @@
 package ui;
 
+import com.mysql.cj.log.Log;
 import model.UserData;
+import request.LoginRequest;
 
 import javax.swing.plaf.nimbus.State;
 
@@ -24,7 +26,6 @@ public class Client {
         Scanner scanner = new Scanner(System.in);
         var result = "";
         while (!result.equals("quit")) {
-            // PRINT PROMPT??
             String line = scanner.nextLine();
 
             try {
@@ -49,7 +50,8 @@ public class Client {
 
             return switch (command) {
                 case "register" -> register(parameters);
-Re                case "quit" -> "quit";
+                case "login" -> login(parameters);
+                case "quit" -> "quit";
                 default -> help();
             };
         } catch (Exception ex) {
@@ -61,15 +63,40 @@ Re                case "quit" -> "quit";
         if (params.length != 3) {
             throw new Exception("Error: Please enter a valid username, password, and email" + "\n");
         }
+
         String username = params[0];
         String password = params[1];
         String email = params[2];
-
         UserData userData = new UserData(username, password, email);
+
         serverFacade.register(userData);
+        serverFacade.login(new LoginRequest(userData.username(), userData.password()));
+        loggedIn = true;
 
         return String.format("Hi %s, you've successfully registered! \n", username);
     }
+
+    public String login(String... params) throws Exception {
+        if (loggedIn) {
+            throw new Exception("Error: You are already logged in! \n");
+        }
+        if (params.length != 2) {
+            throw new Exception("Error: Please enter your username and password \n");
+        }
+
+        String username = params[0];
+        String password = params[1];
+        LoginRequest loginRequest = new LoginRequest(username, password);
+
+        serverFacade.login(loginRequest);
+        loggedIn = true;
+
+        return String.format("%s, you are logged in! \n", username);
+    }
+
+//    public String logout() throws Exception {
+//
+//    }
 
     public String help() {
         if (!loggedIn) {
