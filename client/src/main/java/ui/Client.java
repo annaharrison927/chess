@@ -2,11 +2,13 @@ package ui;
 
 import com.mysql.cj.log.Log;
 import model.UserData;
+import request.CreateGameRequest;
 import request.LoginRequest;
 
 import javax.swing.plaf.nimbus.State;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
@@ -52,6 +54,8 @@ public class Client {
                 case "register" -> register(parameters);
                 case "login" -> login(parameters);
                 case "logout" -> logout();
+                case "create" -> create(parameters);
+                case "list" -> list();
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -96,13 +100,29 @@ public class Client {
     }
 
     public String logout() throws Exception {
-        if (!loggedIn) {
-            throw new Exception("Error: You're not logged in! \n");
-        }
+        assertLoggedIn();
         serverFacade.logout();
         loggedIn = false;
 
         return "You have successfully logged out! \n";
+    }
+
+    public String create(String... params) throws Exception {
+        assertLoggedIn();
+        if (params.length != 1) {
+            throw new Exception("Error: Please enter a game name \n");
+        }
+
+        String gameName = params[0];
+        serverFacade.create(gameName);
+
+        return String.format("You created a new game: %s \n", gameName);
+    }
+
+    public String list() throws Exception {
+        assertLoggedIn();
+        Collection<String> gameList = serverFacade.list();
+        return String.join("", gameList);
     }
 
     public String help() {
@@ -123,6 +143,12 @@ public class Client {
                     * quit
                     * help
                     """;
+        }
+    }
+
+    private void assertLoggedIn() throws Exception {
+        if (!loggedIn) {
+            throw new Exception("Error: You're not logged in! \n");
         }
     }
 

@@ -1,9 +1,11 @@
 package ui;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import exceptions.AlreadyTakenException;
 import exceptions.BadRequestException;
 import exceptions.DataAccessException;
+import model.GameData;
 import model.UserData;
 import request.*;
 import result.*;
@@ -12,11 +14,16 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
     private final String serverUrl;
     private String authToken;
+    private Map<Integer, Integer> idLibrary = new HashMap<>();
 
     public ServerFacade(String url) {
         serverUrl = url;
@@ -45,6 +52,36 @@ public class ServerFacade {
         authToken = null;
         handleResponse(response, LogoutResult.class);
     }
+
+    public void create(String gameName) throws Exception {
+        CreateGameRequest createGameRequest = new CreateGameRequest(gameName, authToken);
+        var request = buildRequest("POST", "/game", createGameRequest, authToken);
+        var response = sendRequest(request);
+        handleResponse(response, CreateGameRequest.class);
+    }
+
+    public Collection<String> list() throws Exception {
+        ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
+        var request = buildRequest("GET", "/game", listGamesRequest, authToken);
+        var response = sendRequest(request);
+        handleResponse(response, CreateGameRequest.class);
+
+        ListGamesResult listGamesResult = new Gson().fromJson(response.body(), ListGamesResult.class);
+        Collection<GameData> games = listGamesResult.games();
+        idLibrary.clear();
+        Collection<String> gameList = new ArrayList<>();
+        int i = 1;
+        for (GameData gameData : games) {
+            int gameID = gameData.gameID();
+            idLibrary.put(i, gameID);
+            String gameName = gameData.gameName();
+            String gameStr = String.format("%d. %s \n", i, gameName);
+            gameList.add(gameStr);
+            i++;
+        }
+        return gameList;
+    }
+
 
     private HttpRequest buildRequest(String method, String path, Object body, String authToken) {
         var request = HttpRequest.newBuilder()
