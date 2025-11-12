@@ -15,12 +15,19 @@ import static ui.EscapeSequences.*;
 
 public class Client {
     private final ServerFacade serverFacade;
-    private boolean loggedIn = false;
     private Collection<String> gameList;
+    private State state = State.LOGGED_OUT;
 
     public Client(String serverUrl) throws Exception {
         serverFacade = new ServerFacade(serverUrl);
     }
+
+    public enum State {
+        LOGGED_IN,
+        LOGGED_OUT,
+        IN_GAME
+    }
+
 
     public void run() {
         System.out.println("Welcome to Chess! Select an option from the menu.");
@@ -79,13 +86,13 @@ public class Client {
 
         serverFacade.register(userData);
         serverFacade.login(new LoginRequest(userData.username(), userData.password()));
-        loggedIn = true;
+        state = State.LOGGED_IN;
 
         return String.format("Hi %s, you've successfully registered! \n", username);
     }
 
     public String login(String... params) throws Exception {
-        if (loggedIn) {
+        if (state == State.LOGGED_IN) {
             throw new Exception("Error: You are already logged in! \n");
         }
         if (params.length != 2) {
@@ -97,7 +104,7 @@ public class Client {
         LoginRequest loginRequest = new LoginRequest(username, password);
 
         serverFacade.login(loginRequest);
-        loggedIn = true;
+        state = State.LOGGED_IN;
 
         return String.format("%s, you are logged in! \n", username);
     }
@@ -105,7 +112,7 @@ public class Client {
     public String logout() throws Exception {
         assertLoggedIn();
         serverFacade.logout();
-        loggedIn = false;
+        state = State.LOGGED_OUT;
 
         return "You have successfully logged out! \n";
     }
@@ -137,6 +144,7 @@ public class Client {
         String color = params[1].toUpperCase();
 
         serverFacade.join(id, color);
+        state = State.IN_GAME;
         return String.format("You joined game #%d as the %s player!\n", id, color);
     }
 
@@ -153,7 +161,7 @@ public class Client {
     }
 
     public String help() {
-        if (!loggedIn) {
+        if (state == State.LOGGED_OUT) {
             return """
                     * register (username, password, email)
                     * login (username, password)
@@ -174,7 +182,7 @@ public class Client {
     }
 
     private void assertLoggedIn() throws Exception {
-        if (!loggedIn) {
+        if (state == State.LOGGED_OUT) {
             throw new Exception("Error: You're not logged in! \n");
         }
     }
