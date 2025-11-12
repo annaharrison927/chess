@@ -16,6 +16,7 @@ import static ui.EscapeSequences.*;
 public class Client {
     private final ServerFacade serverFacade;
     private boolean loggedIn = false;
+    private Collection<String> gameList;
 
     public Client(String serverUrl) throws Exception {
         serverFacade = new ServerFacade(serverUrl);
@@ -56,6 +57,8 @@ public class Client {
                 case "logout" -> logout();
                 case "create" -> create(parameters);
                 case "list" -> list();
+                case "join" -> join(parameters);
+                case "observe" -> observe(parameters);
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -121,8 +124,32 @@ public class Client {
 
     public String list() throws Exception {
         assertLoggedIn();
-        Collection<String> gameList = serverFacade.list();
+        gameList = serverFacade.list();
         return String.join("", gameList);
+    }
+
+    public String join(String... params) throws Exception {
+        assertLoggedIn();
+        if (params.length != 2) {
+            throw new Exception("Error: Please enter a game id and your team color (WHITE/BLACK) \n");
+        }
+        int id = Integer.parseInt(params[0]);
+        String color = params[1].toUpperCase();
+
+        serverFacade.join(id, color);
+        return String.format("You joined game #%d as the %s player!\n", id, color);
+    }
+
+    public String observe(String... params) throws Exception {
+        assertLoggedIn();
+        if (params.length != 1) {
+            throw new Exception("Error: Please enter the id of the game you would like to observe \n");
+        }
+        int id = Integer.parseInt(params[0]);
+        if (id > gameList.size() || id < 1) {
+            throw new Exception("Error: Invalid game ID");
+        }
+        return String.format("You are now observing game #%d!\n", id);
     }
 
     public String help() {

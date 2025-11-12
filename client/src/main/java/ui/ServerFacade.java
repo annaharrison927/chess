@@ -64,7 +64,7 @@ public class ServerFacade {
         ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
         var request = buildRequest("GET", "/game", listGamesRequest, authToken);
         var response = sendRequest(request);
-        handleResponse(response, CreateGameRequest.class);
+        handleResponse(response, ListGamesResult.class);
 
         ListGamesResult listGamesResult = new Gson().fromJson(response.body(), ListGamesResult.class);
         Collection<GameData> games = listGamesResult.games();
@@ -80,6 +80,14 @@ public class ServerFacade {
             i++;
         }
         return gameList;
+    }
+
+    public void join(int id, String color) throws Exception {
+        int gameID = idLibrary.get(id);
+        JoinGameRequest joinGameRequest = new JoinGameRequest(color, gameID, authToken);
+        var request = buildRequest("PUT", "/game", joinGameRequest, authToken);
+        var response = sendRequest(request);
+        handleResponse(response, JoinGameResult.class);
     }
 
 
