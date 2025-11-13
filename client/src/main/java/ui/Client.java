@@ -145,6 +145,8 @@ public class Client {
 
         serverFacade.join(id, color);
         state = State.IN_GAME;
+        Board startBoard = new Board();
+        startBoard.createBoard(color);
         return String.format("You joined game #%d as the %s player!\n", id, color);
     }
 
@@ -157,6 +159,8 @@ public class Client {
         if (id > gameList.size() || id < 1) {
             throw new Exception("Error: Invalid game ID");
         }
+        Board startBoard = new Board();
+        startBoard.createBoard("WHITE");
         return String.format("You are now observing game #%d!\n", id);
     }
 
