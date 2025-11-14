@@ -18,8 +18,6 @@ public class Board {
     private static final String B = " B ";
     private static final String P = " P ";
 
-    private static Random rand = new Random();
-
     public void createBoard(String color) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
@@ -55,7 +53,8 @@ public class Board {
         for (int boardRow = 0; boardRow < BOARD_SIZE_IN_SQUARES; ++boardRow) {
             String rowNum = numLabels[boardRow];
             for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
-                printChr(color, out, rand.nextBoolean() ? K : Q, boardRow, boardCol, rowNum);
+                String chr = pickPiece(boardRow, boardCol);
+                printChr(color, out, chr, boardRow, boardCol, rowNum);
             }
             out.println();
         }
@@ -76,6 +75,26 @@ public class Board {
             out.print(SET_TEXT_COLOR_GREEN);
             out.print(EMPTY);
             out.print(rowNum);
+        }
+    }
+
+    private static String pickPiece(int boardRow, int boardCol) {
+        if (boardRow == 1 || boardRow == 6) {
+            return P;
+        } else if (boardRow == 0 || boardRow == 7) {
+            if (boardCol == 0 || boardCol == 7) {
+                return R;
+            } else if (boardCol == 1 || boardCol == 6) {
+                return N;
+            } else if (boardCol == 2 || boardCol == 5) {
+                return B;
+            } else if (boardCol == 3) {
+                return Q;
+            } else {
+                return K;
+            }
+        } else {
+            return "   ";
         }
     }
 
