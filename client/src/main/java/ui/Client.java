@@ -193,8 +193,8 @@ public class Client {
         try {
             id = Integer.parseInt(params[0]);
         } catch (Exception ex) {
-            throw new Exception("Error: Please enter the number of the game you would like to play, " +
-                    "followed by team color\n");
+            throw new Exception("Error: Please enter a numerical value for " +
+                    "the game you would like to play \n");
         }
 
         if (gameList == null) {

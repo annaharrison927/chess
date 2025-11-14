@@ -83,8 +83,8 @@ public class ServerFacade {
     }
 
     private static String getGameStr(GameData gameData, int i) {
-        String whitePlayer = "N/A";
-        String blackPlayer = "N/A";
+        String whitePlayer = "[Available: No player yet]";
+        String blackPlayer = "[Available: No player yet]";
         if (gameData.whiteUsername() != null) {
             whitePlayer = gameData.whiteUsername();
         }
@@ -150,7 +150,7 @@ public class ServerFacade {
                 if (status == 403) {
                     throw new AlreadyTakenException("Error: Already taken" + "\n");
                 } else if (status == 401) {
-                    throw new DataAccessException("Error: Cannot access data" + "\n");
+                    throw new DataAccessException("Error: Unauthorized" + "\n");
                 } else if (status == 400) {
                     throw new BadRequestException("Error: Invalid input" + "\n");
                 } else if (status == 500) {
