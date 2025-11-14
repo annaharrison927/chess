@@ -1,17 +1,12 @@
 package ui;
 
-import com.mysql.cj.log.Log;
 import model.UserData;
-import request.CreateGameRequest;
 import request.LoginRequest;
-
-import javax.swing.plaf.nimbus.State;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Scanner;
 
-import static ui.EscapeSequences.*;
 
 public class Client {
     private final ServerFacade serverFacade;
