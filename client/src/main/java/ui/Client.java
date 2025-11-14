@@ -140,7 +140,9 @@ public class Client {
         if (params.length != 2) {
             throw new Exception("Error: Please enter a game id and your team color (WHITE/BLACK) \n");
         }
-        int id = Integer.parseInt(params[0]);
+
+        int id = checkID(params);
+
         String color = params[1].toUpperCase();
 
         serverFacade.join(id, color);
@@ -155,10 +157,9 @@ public class Client {
         if (params.length != 1) {
             throw new Exception("Error: Please enter the id of the game you would like to observe \n");
         }
-        int id = Integer.parseInt(params[0]);
-        if (id > gameList.size() || id < 1) {
-            throw new Exception("Error: Invalid game ID");
-        }
+
+        int id = checkID(params);
+
         Board startBoard = new Board();
         startBoard.createBoard("WHITE");
         return String.format("You are now observing game #%d!\n", id);
@@ -189,6 +190,27 @@ public class Client {
         if (state == State.LOGGED_OUT) {
             throw new Exception("Error: You're not logged in! \n");
         }
+    }
+
+    private int checkID(String... params) throws Exception {
+        int id;
+
+        try {
+            id = Integer.parseInt(params[0]);
+        } catch (Exception ex) {
+            throw new Exception("Error: Please enter the number of the game you would like to play, " +
+                    "followed by team color\n");
+        }
+
+        if (gameList == null) {
+            throw new Exception("Error: Please list games before joining a game");
+        }
+
+        if (id > gameList.size() || id < 1) {
+            throw new Exception("Error: Invalid game ID\n");
+        }
+
+        return id;
     }
 
 }

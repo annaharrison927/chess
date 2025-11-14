@@ -53,7 +53,7 @@ public class Board {
         for (int boardRow = 0; boardRow < BOARD_SIZE_IN_SQUARES; ++boardRow) {
             String rowNum = numLabels[boardRow];
             for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
-                String chr = pickPiece(boardRow, boardCol);
+                String chr = pickPiece(boardRow, boardCol, color);
                 printChr(color, out, chr, boardRow, boardCol, rowNum);
             }
             out.println();
@@ -78,7 +78,7 @@ public class Board {
         }
     }
 
-    private static String pickPiece(int boardRow, int boardCol) {
+    private static String pickPiece(int boardRow, int boardCol, String color) {
         if (boardRow == 1 || boardRow == 6) {
             return P;
         } else if (boardRow == 0 || boardRow == 7) {
@@ -89,9 +89,17 @@ public class Board {
             } else if (boardCol == 2 || boardCol == 5) {
                 return B;
             } else if (boardCol == 3) {
-                return Q;
+                if (Objects.equals(color, "WHITE")) {
+                    return Q;
+                } else {
+                    return K;
+                }
             } else {
-                return K;
+                if (Objects.equals(color, "WHITE")) {
+                    return K;
+                } else {
+                    return Q;
+                }
             }
         } else {
             return "   ";
@@ -115,9 +123,9 @@ public class Board {
     }
 
     private static void pickPieceColor(int boardRow, String color, PrintStream out) {
-        if (Objects.equals(color, "WHITE") && (boardRow == 0 || boardRow == 1)) {
+        if (Objects.equals(color, "WHITE") && (boardRow == 6 || boardRow == 7)) {
             out.print(SET_TEXT_COLOR_WHITE);
-        } else if (Objects.equals(color, "BLACK") && (boardRow == 6 || boardRow == 7)) {
+        } else if (Objects.equals(color, "BLACK") && (boardRow == 0 || boardRow == 1)) {
             out.print(SET_TEXT_COLOR_WHITE);
         } else {
             out.print(SET_TEXT_COLOR_BLACK);

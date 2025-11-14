@@ -74,13 +74,28 @@ public class ServerFacade {
         for (GameData gameData : games) {
             int gameID = gameData.gameID();
             idLibrary.put(i, gameID);
-            String gameName = gameData.gameName();
-            String gameStr = String.format("%d. %s \n", i, gameName);
+
+            String gameStr = getGameStr(gameData, i);
             gameList.add(gameStr);
             i++;
         }
         return gameList;
     }
+
+    private static String getGameStr(GameData gameData, int i) {
+        String whitePlayer = "N/A";
+        String blackPlayer = "N/A";
+        if (gameData.whiteUsername() != null) {
+            whitePlayer = gameData.whiteUsername();
+        }
+        if (gameData.blackUsername() != null) {
+            blackPlayer = gameData.blackUsername();
+        }
+
+        String gameName = gameData.gameName();
+        return String.format("%d. %s (WHITE team: %s; BLACK team: %s)\n", i, gameName, whitePlayer, blackPlayer);
+    }
+
 
     public void join(int id, String color) throws Exception {
         int gameID = idLibrary.get(id);
@@ -88,6 +103,13 @@ public class ServerFacade {
         var request = buildRequest("PUT", "/game", joinGameRequest, authToken);
         var response = sendRequest(request);
         handleResponse(response, JoinGameResult.class);
+    }
+
+    public void clear() throws Exception {
+        ClearApplicationRequest clearApplicationRequest = new ClearApplicationRequest();
+        var request = buildRequest("DELETE", "/db", clearApplicationRequest, null);
+        var response = sendRequest(request);
+        handleResponse(response, ClearApplicationResult.class);
     }
 
 
@@ -108,7 +130,7 @@ public class ServerFacade {
         try {
             return client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (Exception ex) {
-            throw new Exception("Error: " + ex.getMessage() + "\n"); // EDIT THIS LATER
+            throw new Exception("Error: " + ex.getMessage() + "\n");
         }
     }
 
@@ -130,7 +152,7 @@ public class ServerFacade {
                 } else if (status == 401) {
                     throw new DataAccessException("Error: Cannot access data" + "\n");
                 } else if (status == 400) {
-                    throw new BadRequestException("Error: Bad request" + "\n");
+                    throw new BadRequestException("Error: Invalid input" + "\n");
                 } else if (status == 500) {
                     throw new DataAccessException("Error: Failed to connect" + "\n");
                 }
@@ -143,4 +165,5 @@ public class ServerFacade {
         }
 
     }
+
 }
