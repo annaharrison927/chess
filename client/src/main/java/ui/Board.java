@@ -20,15 +20,6 @@ public class Board {
 
     private static Random rand = new Random();
 
-//    public static void main(String[] args) {
-//        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-//        String[] rowNames = {"8\n", "7\n", "6\n", "5\n", "4\n", "3\n", "2\n", "1\n"};
-//        out.print(ERASE_SCREEN);
-//
-//        drawHeaders(out, color);
-//        drawBoard(out);
-//    }
-
     public void createBoard(String color) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
@@ -64,7 +55,7 @@ public class Board {
         for (int boardRow = 0; boardRow < BOARD_SIZE_IN_SQUARES; ++boardRow) {
             String rowNum = numLabels[boardRow];
             for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
-                printPlayer(out, rand.nextBoolean() ? K : Q, boardRow, boardCol, rowNum);
+                printChr(color, out, rand.nextBoolean() ? K : Q, boardRow, boardCol, rowNum);
             }
             out.println();
         }
@@ -75,7 +66,20 @@ public class Board {
         out.print(SET_TEXT_COLOR_BLACK);
     }
 
-    private static void printPlayer(PrintStream out, String player, int boardRow, int boardCol, String rowNum) {
+    private static void printChr(String color, PrintStream out, String chr, int boardRow, int boardCol, String rowNum) {
+        pickSquareColor(boardRow, boardCol, out);
+        pickPieceColor(boardRow, color, out);
+        out.print(chr);
+        setBlack(out);
+
+        if (boardCol == 7) {
+            out.print(SET_TEXT_COLOR_GREEN);
+            out.print(EMPTY);
+            out.print(rowNum);
+        }
+    }
+
+    private static void pickSquareColor(int boardRow, int boardCol, PrintStream out) {
         if (boardRow % 2 == 0) {
             if (boardCol % 2 == 0) {
                 out.print(SET_BG_COLOR_RED);
@@ -89,15 +93,15 @@ public class Board {
                 out.print(SET_BG_COLOR_RED);
             }
         }
+    }
 
-        out.print(SET_TEXT_COLOR_BLACK);
-        out.print(player);
-        setBlack(out);
-
-        if (boardCol == 7) {
-            out.print(SET_TEXT_COLOR_GREEN);
-            out.print(EMPTY);
-            out.print(rowNum);
+    private static void pickPieceColor(int boardRow, String color, PrintStream out) {
+        if (Objects.equals(color, "WHITE") && (boardRow == 0 || boardRow == 1)) {
+            out.print(SET_TEXT_COLOR_WHITE);
+        } else if (Objects.equals(color, "BLACK") && (boardRow == 6 || boardRow == 7)) {
+            out.print(SET_TEXT_COLOR_WHITE);
+        } else {
+            out.print(SET_TEXT_COLOR_BLACK);
         }
     }
 }
