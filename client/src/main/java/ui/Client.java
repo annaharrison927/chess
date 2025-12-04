@@ -160,6 +160,11 @@ public class Client {
         return String.format("You are now observing game #%d!\n", id);
     }
 
+    public void redraw() throws Exception {
+        assertInGame();
+        // FIGURE OUT HOW TO STORE AND RETRIEVE BOARD!
+    }
+
     public String help() {
         if (state == State.LOGGED_OUT) {
             return """
@@ -168,7 +173,7 @@ public class Client {
                     * quit
                     * help
                     """;
-        } else {
+        } else if (state == State.LOGGED_IN) {
             return """
                     * create (name) - create a new game
                     * list - list all games
@@ -178,12 +183,28 @@ public class Client {
                     * quit
                     * help
                     """;
+        } else {
+            return """
+                    * redraw - redraw the chess board in its current state
+                    * leave - this will not end the game; you can rejoin later
+                    * resign - forfeit and end the game (this will not cause you to leave)
+                    * move (position) - select the position you would like to move to (e.g. a4)
+                    * highlight (position) - see all possible moves for a piece at a given position
+                    * help
+                    """;
         }
     }
 
     private void assertLoggedIn() throws Exception {
         if (state == State.LOGGED_OUT) {
             throw new Exception("Error: You're not logged in! \n");
+        }
+    }
+
+    private void assertInGame() throws Exception {
+        assertLoggedIn();
+        if (state != State.IN_GAME) {
+            throw new Exception("Error: You haven't joined a game yet!");
         }
     }
 
