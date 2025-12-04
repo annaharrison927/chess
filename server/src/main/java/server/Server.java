@@ -12,6 +12,7 @@ import result.*;
 import service.AlreadyTakenException;
 import service.BadRequestException;
 import service.Service;
+import websocket.WebSocketHandler;
 
 import java.util.Map;
 import java.util.Objects;
@@ -20,6 +21,7 @@ public class Server {
 
     private final Javalin server;
     private final Service service = new Service();
+    private final WebSocketHandler webSocketHandler = new WebSocketHandler();
 
     public Server() {
         server = Javalin.create(config -> config.staticFiles.add("web"));
@@ -32,6 +34,11 @@ public class Server {
         server.post("game", this::createGame);
         server.put("game", this::joinGame);
         server.get("game", this::listGames);
+        server.ws("/ws", ws -> {
+            ws.onConnect(webSocketHandler);
+            ws.onMessage(webSocketHandler);
+            ws.onClose(webSocketHandler);
+        });
     }
 
     public int run(int desiredPort) {
