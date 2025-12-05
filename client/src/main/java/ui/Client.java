@@ -2,19 +2,24 @@ package ui;
 
 import model.UserData;
 import request.LoginRequest;
+import websocket.ServerMessageHandler;
+import websocket.WebSocketFacade;
+import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Scanner;
 
 
-public class Client {
+public class Client implements ServerMessageHandler {
     private final ServerFacade serverFacade;
+    private final WebSocketFacade ws;
     private Collection<String> gameList;
     private State state = State.LOGGED_OUT;
 
     public Client(String serverUrl) throws Exception {
         serverFacade = new ServerFacade(serverUrl);
+        ws = new WebSocketFacade(serverUrl, this);
     }
 
     public enum State {
@@ -42,6 +47,10 @@ public class Client {
             }
         }
         System.out.println();
+    }
+
+    public void notify(ServerMessage message) {
+        System.out.println(message + "\n");
     }
 
     public String evaluate(String input) {
