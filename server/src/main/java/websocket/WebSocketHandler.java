@@ -73,7 +73,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             throw new Exception(errorMessage.getErrorMessage());
         }
 
-        String gameName = gameDataAccess.getGame(gameID).gameName();
+        ChessGame chessGame = gameDataAccess.getGame(gameID).game();
         String username = authDataAccess.getAuth(authToken).username();
 
         ChessGame.TeamColor color = null;
@@ -91,7 +91,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
 
         LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME,
-                String.format("Your game (%s) has loaded", gameName));
+                chessGame);
         connections.broadcast(session, "root", loadGameMessage);
 
         NotificationMessage notificationMessage = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,

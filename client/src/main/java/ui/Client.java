@@ -1,9 +1,11 @@
 package ui;
 
+import chess.ChessGame;
 import model.UserData;
 import request.LoginRequest;
 import websocket.ServerMessageHandler;
 import websocket.WebSocketFacade;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
@@ -16,10 +18,20 @@ public class Client implements ServerMessageHandler {
     private final WebSocketFacade ws;
     private Collection<String> gameList;
     private State state = State.LOGGED_OUT;
+    private ChessGame chessGame;
 
     public Client(String serverUrl) throws Exception {
         serverFacade = new ServerFacade(serverUrl);
         ws = new WebSocketFacade(serverUrl, this);
+
+    }
+
+    public ChessGame getChessGame() {
+        return chessGame;
+    }
+
+    public void setChessGame(ChessGame chessGame) {
+        this.chessGame = chessGame;
     }
 
     public enum State {
@@ -51,6 +63,10 @@ public class Client implements ServerMessageHandler {
 
     public void notify(ServerMessage message) {
         System.out.println(message + "\n");
+        if (message.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+            LoadGameMessage loadGameMessage = (LoadGameMessage) message;
+            setChessGame(loadGameMessage.getGame());
+        }
     }
 
     public String evaluate(String input) {
