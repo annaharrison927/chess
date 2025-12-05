@@ -9,6 +9,7 @@ import javax.swing.*;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
 
+
     @Override
     public void handleClose(@NotNull WsCloseContext wsCloseContext) throws Exception {
         System.out.println("Websocket Closed");
