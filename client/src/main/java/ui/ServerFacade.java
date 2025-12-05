@@ -100,8 +100,12 @@ public class ServerFacade {
         return authToken;
     }
 
+    public int getGameID(int id) {
+        return idLibrary.get(id);
+    }
+
     public void join(int id, String color) throws Exception {
-        int gameID = idLibrary.get(id);
+        int gameID = getGameID(id);
         JoinGameRequest joinGameRequest = new JoinGameRequest(color, gameID, authToken);
         var request = buildRequest("PUT", "/game", joinGameRequest, authToken);
         var response = sendRequest(request);

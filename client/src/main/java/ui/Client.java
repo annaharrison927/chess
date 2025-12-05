@@ -154,8 +154,7 @@ public class Client implements ServerMessageHandler {
         Board startBoard = new Board();
         startBoard.createBoard(color);
 
-        String authToken = serverFacade.getAuthToken();
-        ws.connect(authToken, id); // MIGHT NEED TO CHANGE ID
+        connectToWS(id);
         return String.format("You joined game #%d as the %s player!\n", id, color);
     }
 
@@ -166,9 +165,10 @@ public class Client implements ServerMessageHandler {
         }
 
         int id = checkID(params);
-
         Board startBoard = new Board();
         startBoard.createBoard("WHITE");
+
+        connectToWS(id);
         return String.format("You are now observing game #%d!\n", id);
     }
 
@@ -239,6 +239,12 @@ public class Client implements ServerMessageHandler {
         }
 
         return id;
+    }
+
+    private void connectToWS(int id) throws Exception {
+        int gameID = serverFacade.getGameID(id);
+        String authToken = serverFacade.getAuthToken();
+        ws.connect(authToken, gameID);
     }
 
 }
