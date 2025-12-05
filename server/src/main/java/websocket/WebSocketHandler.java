@@ -1,6 +1,8 @@
 package websocket;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
+import dataaccess.*;
 import io.javalin.websocket.*;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
@@ -14,6 +16,20 @@ import java.io.IOException;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     private final ConnectionManager connections = new ConnectionManager();
+    private final UserDataAccess userDataAccess;
+    private final AuthDataAccess authDataAccess;
+    private final GameDataAccess gameDataAccess;
+
+    public WebSocketHandler() {
+        try {
+            DatabaseManager.createDatabase();
+            userDataAccess = new MySQLUserDataAccess();
+            authDataAccess = new MySQLAuthDataAccess();
+            gameDataAccess = new MySQLGameDataAccess();
+        } catch (DataAccessException ex) {
+            throw new RuntimeException(ex.getMessage(), ex);
+        }
+    }
 
     @Override
     public void handleClose(@NotNull WsCloseContext wsCloseContext) throws Exception {
@@ -30,18 +46,31 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     public void handleMessage(@NotNull WsMessageContext wsMessageContext) throws Exception {
         UserGameCommand userGameCommand = new Gson().fromJson(wsMessageContext.message(), UserGameCommand.class);
         UserGameCommand.CommandType commandType = userGameCommand.getCommandType();
+        String authToken = userGameCommand.getAuthToken();
+        Integer gameID = userGameCommand.getGameID();
         switch (commandType) {
-            case CONNECT -> connect(wsMessageContext.session);
+            case CONNECT -> connect(wsMessageContext.session, authToken, gameID);
             case MAKE_MOVE -> makeMove();
             case LEAVE -> leave();
             case RESIGN -> resign();
         }
     }
 
-    private void connect(Session session) throws IOException {
+    private void connect(Session session, String authToken, Integer gameID) throws Exception {
         connections.add(session);
+        String gameName = gameDataAccess.getGame(gameID).gameName();
+        String username = authDataAccess.getAuth(authToken).username();
+        ChessGame.TeamColor color = null;
+        if (username.equals(gameDataAccess.getGame(gameID).blackUsername())) {
+            color = ChessGame.TeamColor.BLACK;
+        } else if (username.equals(gameDataAccess.getGame(gameID).whiteUsername())) {
+            color = ChessGame.TeamColor.WHITE;
+        } else {
+            throw new Exception("Error: Invalid team color");
+        }
+
         LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME,
-                "Your game has loaded"); // Change this to gameName later?
+                String.format("Your game (%s) has loaded", gameName));
         connections.broadcast(session, "root", loadGameMessage);
     }
 
