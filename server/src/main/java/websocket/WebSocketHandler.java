@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import server.Server;
 import websocket.commands.UserGameCommand;
 import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import javax.swing.*;
@@ -60,18 +61,28 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         connections.add(session);
         String gameName = gameDataAccess.getGame(gameID).gameName();
         String username = authDataAccess.getAuth(authToken).username();
+
         ChessGame.TeamColor color = null;
         if (username.equals(gameDataAccess.getGame(gameID).blackUsername())) {
             color = ChessGame.TeamColor.BLACK;
         } else if (username.equals(gameDataAccess.getGame(gameID).whiteUsername())) {
             color = ChessGame.TeamColor.WHITE;
-        } else {
-            throw new Exception("Error: Invalid team color");
+        }
+
+        String role;
+        switch (color) {
+            case null -> role = "an observer";
+            case BLACK -> role = "the black player";
+            case WHITE -> role = "the white player";
         }
 
         LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME,
                 String.format("Your game (%s) has loaded", gameName));
         connections.broadcast(session, "root", loadGameMessage);
+
+        NotificationMessage notificationMessage = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                String.format("%s has joined the game as %s", username, role));
+        connections.broadcast(session, "others", notificationMessage);
     }
 
     private void makeMove() {
