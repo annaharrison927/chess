@@ -6,6 +6,7 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
 import server.Server;
 import websocket.commands.UserGameCommand;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.ServerMessage;
 
 import javax.swing.*;
@@ -39,8 +40,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void connect(Session session) throws IOException {
         connections.add(session);
-        ServerMessage load_game = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
-        connections.broadcast(session, "root", load_game);
+        LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME,
+                "Your game has loaded"); // Change this to gameName later?
+        connections.broadcast(session, "root", loadGameMessage);
     }
 
     private void makeMove() {

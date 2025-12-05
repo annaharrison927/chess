@@ -1,7 +1,11 @@
 package websocket;
 
 
+import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -19,7 +23,7 @@ public class ConnectionManager {
     }
 
     public void broadcast(Session rootSession, String broadcastType, ServerMessage serverMessage) throws IOException {
-        String message = serverMessage.toString();
+        String message = new Gson().toJson(serverMessage);
         for (Session session : connections.values()) {
             if (session.isOpen()) {
                 switch (broadcastType) {
