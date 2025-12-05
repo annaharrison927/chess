@@ -96,6 +96,9 @@ public class ServerFacade {
         return String.format("%d. %s (WHITE team: %s; BLACK team: %s)\n", i, gameName, whitePlayer, blackPlayer);
     }
 
+    public String getAuthToken() {
+        return authToken;
+    }
 
     public void join(int id, String color) throws Exception {
         int gameID = idLibrary.get(id);

@@ -153,6 +153,9 @@ public class Client implements ServerMessageHandler {
         state = State.IN_GAME;
         Board startBoard = new Board();
         startBoard.createBoard(color);
+
+        String authToken = serverFacade.getAuthToken();
+        ws.connect(authToken, );
         return String.format("You joined game #%d as the %s player!\n", id, color);
     }
 
