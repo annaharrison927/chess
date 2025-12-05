@@ -8,6 +8,7 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
 import server.Server;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
@@ -59,6 +60,19 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void connect(Session session, String authToken, Integer gameID) throws Exception {
         connections.add(session);
+
+        if (gameDataAccess.getGame(gameID) == null) {
+            ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR,
+                    "Error: Invalid ID");
+            connections.broadcast(session, "root", errorMessage);
+            throw new Exception(errorMessage.getErrorMessage());
+        } else if (authDataAccess.getAuth(authToken) == null) {
+            ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR,
+                    "Error: Unauthorized");
+            connections.broadcast(session, "root", errorMessage);
+            throw new Exception(errorMessage.getErrorMessage());
+        }
+
         String gameName = gameDataAccess.getGame(gameID).gameName();
         String username = authDataAccess.getAuth(authToken).username();
 
