@@ -155,7 +155,7 @@ public class Client implements ServerMessageHandler {
         startBoard.createBoard(color);
 
         String authToken = serverFacade.getAuthToken();
-        ws.connect(authToken, );
+        ws.connect(authToken, id); // MIGHT NEED TO CHANGE ID
         return String.format("You joined game #%d as the %s player!\n", id, color);
     }
 
