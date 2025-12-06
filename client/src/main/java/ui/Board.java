@@ -9,9 +9,7 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Objects;
-import java.util.Random;
 
-import static chess.ChessPiece.PieceType.PAWN;
 import static ui.EscapeSequences.*;
 
 public class Board {
@@ -25,17 +23,17 @@ public class Board {
     private static final String B = " B ";
     private static final String P = " P ";
 
-    private static final HashMap<Integer, Integer> blackWhiteFlipMap = new HashMap<>();
+    private static final HashMap<Integer, Integer> BLACK_WHITE_FLIP_MAP = new HashMap<>();
 
     static {
-        blackWhiteFlipMap.put(0, 7);
-        blackWhiteFlipMap.put(1, 6);
-        blackWhiteFlipMap.put(2, 5);
-        blackWhiteFlipMap.put(3, 4);
-        blackWhiteFlipMap.put(4, 3);
-        blackWhiteFlipMap.put(5, 2);
-        blackWhiteFlipMap.put(6, 1);
-        blackWhiteFlipMap.put(7, 0);
+        BLACK_WHITE_FLIP_MAP.put(0, 7);
+        BLACK_WHITE_FLIP_MAP.put(1, 6);
+        BLACK_WHITE_FLIP_MAP.put(2, 5);
+        BLACK_WHITE_FLIP_MAP.put(3, 4);
+        BLACK_WHITE_FLIP_MAP.put(4, 3);
+        BLACK_WHITE_FLIP_MAP.put(5, 2);
+        BLACK_WHITE_FLIP_MAP.put(6, 1);
+        BLACK_WHITE_FLIP_MAP.put(7, 0);
     }
 
     public void createBoard(String color, ChessGame chessGame) {
@@ -103,6 +101,7 @@ public class Board {
         }
     }
 
+/*
     private static String pickPiece(int boardRow, int boardCol, String color) {
         if (boardRow == 1 || boardRow == 6) {
             return P;
@@ -130,11 +129,12 @@ public class Board {
             return "   ";
         }
     }
+*/
 
     private static String pickPiece2(int boardRow, int boardCol, String color, ChessBoard chessBoard) {
         if (Objects.equals(color, "BLACK")) {
-            boardRow = blackWhiteFlipMap.get(boardRow);
-            boardCol = blackWhiteFlipMap.get(boardCol);
+            boardRow = BLACK_WHITE_FLIP_MAP.get(boardRow);
+            boardCol = BLACK_WHITE_FLIP_MAP.get(boardCol);
         }
         ChessPiece.PieceType pieceType = chessBoard.getPiece(new ChessPosition(boardCol, boardRow)).getPieceType();
         switch (pieceType) {

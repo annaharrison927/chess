@@ -76,8 +76,8 @@ public class Client implements ServerMessageHandler {
         if (message.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
             LoadGameMessage loadGameMessage = (LoadGameMessage) message;
             setChessGame(loadGameMessage.getGame());
-            Board startBoard = new Board();
-            startBoard.createBoard(teamColor, chessGame);
+            Board board = new Board();
+            board.createBoard(teamColor, chessGame);
             System.out.println("Game loaded\n");
         } else if (message.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
             NotificationMessage notificationMessage = (NotificationMessage) message;
@@ -180,11 +180,11 @@ public class Client implements ServerMessageHandler {
             throw new Exception("Error: Please enter a game id and your team color (WHITE/BLACK) \n");
         }
 
-        int id = checkID(params);
-        connectToWS(id);
-
         String color = params[1].toUpperCase();
         setTeamColor(color);
+
+        int id = checkID(params);
+        connectToWS(id);
 
         serverFacade.join(id, color);
         state = State.IN_GAME;
@@ -206,10 +206,12 @@ public class Client implements ServerMessageHandler {
         return String.format("You are now observing game #%d!\n", id);
     }
 
+/*
     public void redraw() throws Exception {
         assertInGame();
         // FIGURE OUT HOW TO STORE AND RETRIEVE BOARD!
     }
+*/
 
     public String help() {
         if (state == State.LOGGED_OUT) {
