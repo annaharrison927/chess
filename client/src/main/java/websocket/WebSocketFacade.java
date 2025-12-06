@@ -30,21 +30,23 @@ public class WebSocketFacade extends Endpoint {
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
 
-            this.session.addMessageHandler((MessageHandler.Whole<String>) message -> {
-                ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
-                ServerMessage.ServerMessageType serverMessageType = serverMessage.getServerMessageType();
-                switch (serverMessageType) {
-                    case LOAD_GAME -> {
-                        LoadGameMessage lMessage = new Gson().fromJson(message, LoadGameMessage.class);
-                        serverMessageHandler.notify(lMessage);
-                    }
-                    case NOTIFICATION -> {
-                        NotificationMessage nMessage = new Gson().fromJson(message, NotificationMessage.class);
-                        serverMessageHandler.notify(nMessage);
-                    }
-                    case ERROR -> {
-                        ErrorMessage eMessage = new Gson().fromJson(message, ErrorMessage.class);
-                        serverMessageHandler.notify(eMessage);
+            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+                public void onMessage(String message) {
+                    ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
+                    ServerMessage.ServerMessageType serverMessageType = serverMessage.getServerMessageType();
+                    switch (serverMessageType) {
+                        case LOAD_GAME -> {
+                            LoadGameMessage lMessage = new Gson().fromJson(message, LoadGameMessage.class);
+                            serverMessageHandler.notify(lMessage);
+                        }
+                        case NOTIFICATION -> {
+                            NotificationMessage nMessage = new Gson().fromJson(message, NotificationMessage.class);
+                            serverMessageHandler.notify(nMessage);
+                        }
+                        case ERROR -> {
+                            ErrorMessage eMessage = new Gson().fromJson(message, ErrorMessage.class);
+                            serverMessageHandler.notify(eMessage);
+                        }
                     }
                 }
             });
