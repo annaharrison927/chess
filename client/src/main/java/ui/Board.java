@@ -101,42 +101,44 @@ public class Board {
         }
     }
 
-/*
-    private static String pickPiece(int boardRow, int boardCol, String color) {
-        if (boardRow == 1 || boardRow == 6) {
-            return P;
-        } else if (boardRow == 0 || boardRow == 7) {
-            if (boardCol == 0 || boardCol == 7) {
-                return R;
-            } else if (boardCol == 1 || boardCol == 6) {
-                return N;
-            } else if (boardCol == 2 || boardCol == 5) {
-                return B;
-            } else if (boardCol == 3) {
-                if (Objects.equals(color, "WHITE")) {
-                    return Q;
-                } else {
-                    return K;
-                }
-            } else {
-                if (Objects.equals(color, "WHITE")) {
-                    return K;
-                } else {
-                    return Q;
-                }
-            }
-        } else {
-            return "   ";
-        }
-    }
-*/
+
+//    private static String pickPiece(int boardRow, int boardCol, String color) {
+//        if (boardRow == 1 || boardRow == 6) {
+//            return P;
+//        } else if (boardRow == 0 || boardRow == 7) {
+//            if (boardCol == 0 || boardCol == 7) {
+//                return R;
+//            } else if (boardCol == 1 || boardCol == 6) {
+//                return N;
+//            } else if (boardCol == 2 || boardCol == 5) {
+//                return B;
+//            } else if (boardCol == 3) {
+//                if (Objects.equals(color, "WHITE")) {
+//                    return Q;
+//                } else {
+//                    return K;
+//                }
+//            } else {
+//                if (Objects.equals(color, "WHITE")) {
+//                    return K;
+//                } else {
+//                    return Q;
+//                }
+//            }
+//        } else {
+//            return "   ";
+//        }
+//    }
+
 
     private static String pickPiece2(int boardRow, int boardCol, String color, ChessBoard chessBoard) {
+        int tempRow = boardRow + 1;
+        int tempCol = boardCol + 1;
         if (Objects.equals(color, "BLACK")) {
-            boardRow = BLACK_WHITE_FLIP_MAP.get(boardRow);
-            boardCol = BLACK_WHITE_FLIP_MAP.get(boardCol);
+            tempRow = BLACK_WHITE_FLIP_MAP.get(boardRow) + 1;
+            tempCol = BLACK_WHITE_FLIP_MAP.get(boardCol) + 1;
         }
-        ChessPiece.PieceType pieceType = chessBoard.getPiece(new ChessPosition(boardCol, boardRow)).getPieceType();
+        ChessPiece.PieceType pieceType = chessBoard.getPiece(new ChessPosition(tempRow, tempCol)).getPieceType();
         switch (pieceType) {
             case null -> {
                 return "   ";
