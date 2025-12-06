@@ -1,10 +1,17 @@
 package ui;
 
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
+
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.Random;
 
+import static chess.ChessPiece.PieceType.PAWN;
 import static ui.EscapeSequences.*;
 
 public class Board {
@@ -18,14 +25,32 @@ public class Board {
     private static final String B = " B ";
     private static final String P = " P ";
 
-    public void createBoard(String color) {
+    private static final HashMap<Integer, Integer> blackWhiteFlipMap = new HashMap<>();
+
+    static {
+        blackWhiteFlipMap.put(0, 7);
+        blackWhiteFlipMap.put(1, 6);
+        blackWhiteFlipMap.put(2, 5);
+        blackWhiteFlipMap.put(3, 4);
+        blackWhiteFlipMap.put(4, 3);
+        blackWhiteFlipMap.put(5, 2);
+        blackWhiteFlipMap.put(6, 1);
+        blackWhiteFlipMap.put(7, 0);
+    }
+
+    public void createBoard(String color, ChessGame chessGame) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
 
+        ChessBoard chessBoard = chessGame.getBoard();
+        if (chessBoard.boardEmpty()) {
+
+        }
+
         setBlack(out);
         drawHeaders(out, color);
-        drawBoard(out, color);
+        drawBoard(out, color, chessBoard);
     }
 
     private static void drawHeaders(PrintStream out, String color) {
@@ -44,7 +69,7 @@ public class Board {
         out.println();
     }
 
-    private static void drawBoard(PrintStream out, String color) {
+    private static void drawBoard(PrintStream out, String color, ChessBoard chessBoard) {
         String[] numLabels = {"8", "7", "6", "5", "4", "3", "2", "1"};
         if (Objects.equals(color, "BLACK")) {
             numLabels = new String[]{"1", "2", "3", "4", "5", "6", "7", "8"};
@@ -53,7 +78,7 @@ public class Board {
         for (int boardRow = 0; boardRow < BOARD_SIZE_IN_SQUARES; ++boardRow) {
             String rowNum = numLabels[boardRow];
             for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
-                String chr = pickPiece(boardRow, boardCol, color);
+                String chr = pickPiece2(boardRow, boardCol, color, chessBoard);
                 printChr(color, out, chr, boardRow, boardCol, rowNum);
             }
             out.println();
@@ -106,6 +131,37 @@ public class Board {
         }
     }
 
+    private static String pickPiece2(int boardRow, int boardCol, String color, ChessBoard chessBoard) {
+        if (Objects.equals(color, "BLACK")) {
+            boardRow = blackWhiteFlipMap.get(boardRow);
+            boardCol = blackWhiteFlipMap.get(boardCol);
+        }
+        ChessPiece.PieceType pieceType = chessBoard.getPiece(new ChessPosition(boardCol, boardRow)).getPieceType();
+        switch (pieceType) {
+            case null -> {
+                return "   ";
+            }
+            case KING -> {
+                return K;
+            }
+            case QUEEN -> {
+                return Q;
+            }
+            case BISHOP -> {
+                return B;
+            }
+            case KNIGHT -> {
+                return N;
+            }
+            case ROOK -> {
+                return R;
+            }
+            case PAWN -> {
+                return P;
+            }
+        }
+    }
+
     private static void pickSquareColor(int boardRow, int boardCol, PrintStream out) {
         if (boardRow % 2 == 0) {
             if (boardCol % 2 == 0) {
@@ -131,4 +187,5 @@ public class Board {
             out.print(SET_TEXT_COLOR_BLACK);
         }
     }
+
 }

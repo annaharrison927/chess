@@ -5,7 +5,9 @@ import model.UserData;
 import request.LoginRequest;
 import websocket.ServerMessageHandler;
 import websocket.WebSocketFacade;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
@@ -19,6 +21,7 @@ public class Client implements ServerMessageHandler {
     private Collection<String> gameList;
     private State state = State.LOGGED_OUT;
     private ChessGame chessGame;
+    private String teamColor;
 
     public Client(String serverUrl) throws Exception {
         serverFacade = new ServerFacade(serverUrl);
@@ -32,6 +35,14 @@ public class Client implements ServerMessageHandler {
 
     public void setChessGame(ChessGame chessGame) {
         this.chessGame = chessGame;
+    }
+
+    public String getTeamColor() {
+        return teamColor;
+    }
+
+    public void setTeamColor(String color) {
+        this.teamColor = color;
     }
 
     public enum State {
@@ -62,10 +73,18 @@ public class Client implements ServerMessageHandler {
     }
 
     public void notify(ServerMessage message) {
-        System.out.println(message + "\n");
         if (message.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
             LoadGameMessage loadGameMessage = (LoadGameMessage) message;
             setChessGame(loadGameMessage.getGame());
+            Board startBoard = new Board();
+            startBoard.createBoard(teamColor, chessGame);
+            System.out.println("Game loaded\n");
+        } else if (message.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
+            NotificationMessage notificationMessage = (NotificationMessage) message;
+            System.out.println(notificationMessage.getMessage() + "\n");
+        } else {
+            ErrorMessage errorMessage = (ErrorMessage) message;
+            System.out.println(errorMessage.getErrorMessage() + "\n");
         }
     }
 
@@ -162,15 +181,15 @@ public class Client implements ServerMessageHandler {
         }
 
         int id = checkID(params);
+        connectToWS(id);
 
         String color = params[1].toUpperCase();
+        setTeamColor(color);
 
         serverFacade.join(id, color);
         state = State.IN_GAME;
-        Board startBoard = new Board();
-        startBoard.createBoard(color);
 
-        connectToWS(id);
+
         return String.format("You joined game #%d as the %s player!\n", id, color);
     }
 
@@ -181,8 +200,7 @@ public class Client implements ServerMessageHandler {
         }
 
         int id = checkID(params);
-        Board startBoard = new Board();
-        startBoard.createBoard("WHITE");
+        setTeamColor("WHITE");
 
         connectToWS(id);
         return String.format("You are now observing game #%d!\n", id);
