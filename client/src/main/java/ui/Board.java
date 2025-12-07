@@ -42,9 +42,6 @@ public class Board {
         out.print(ERASE_SCREEN);
 
         ChessBoard chessBoard = chessGame.getBoard();
-        if (chessBoard.boardEmpty()) {
-
-        }
 
         setBlack(out);
         drawHeaders(out, color);
@@ -138,28 +135,32 @@ public class Board {
             tempRow = BLACK_WHITE_FLIP_MAP.get(boardRow) + 1;
             tempCol = BLACK_WHITE_FLIP_MAP.get(boardCol) + 1;
         }
-        ChessPiece.PieceType pieceType = chessBoard.getPiece(new ChessPosition(tempRow, tempCol)).getPieceType();
-        switch (pieceType) {
-            case null -> {
-                return "   ";
-            }
-            case KING -> {
-                return K;
-            }
-            case QUEEN -> {
-                return Q;
-            }
-            case BISHOP -> {
-                return B;
-            }
-            case KNIGHT -> {
-                return N;
-            }
-            case ROOK -> {
-                return R;
-            }
-            case PAWN -> {
-                return P;
+        ChessPiece piece = chessBoard.getPiece(new ChessPosition(tempRow, tempCol));
+        if (piece == null) {
+            return "   ";
+        } else {
+            switch (piece.getPieceType()) {
+                case null -> {
+                    return "   ";
+                }
+                case KING -> {
+                    return K;
+                }
+                case QUEEN -> {
+                    return Q;
+                }
+                case BISHOP -> {
+                    return B;
+                }
+                case KNIGHT -> {
+                    return N;
+                }
+                case ROOK -> {
+                    return R;
+                }
+                case PAWN -> {
+                    return P;
+                }
             }
         }
     }
